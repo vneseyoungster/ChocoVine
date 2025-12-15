@@ -35,12 +35,10 @@ This is the game-changer: **different phases use separate context windows via sp
 
 ## Getting Started
 
-Drop these files into your project folder:
+Simply clone this repository:
 
 ```bash
-cp -r .claude /path/to/your/project/
-cp -r docs /path/to/your/project/
-cp CLAUDE.md /path/to/your/project/
+git clone https://github.com/vneseyoungster/Vibe-Starter-Pack.git
 ```
 
 ## How to Use It
