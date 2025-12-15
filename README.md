@@ -1,4 +1,4 @@
-# Vibe-Starter-Pack
+# ChocoPine 0.1
 
 **Stop stressing. Start vibing.**
 
