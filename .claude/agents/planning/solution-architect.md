@@ -58,7 +58,7 @@ Identify:
 ## Output Format
 
 ### Architecture Document
-Save to: `docs/plans/architecture-{session}.md`
+Save to: `plans/architecture-{session}.md`
 
 ```markdown
 # Architecture: [Feature Name]
@@ -150,4 +150,4 @@ Before presenting architecture:
 ### architecture-planning
 Use to create architecture documents with decision records.
 See: `.claude/skills/planning/architecture-planning/SKILL.md`
-Output: `docs/plans/architecture-{session}.md`
+Output: `plans/architecture-{session}.md`

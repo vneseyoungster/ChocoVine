@@ -15,7 +15,7 @@ The planning phase transforms validated requirements into executable implementat
 | Model | `opus` |
 | Tools | Read, Write, Glob, Grep |
 | Input | Requirements from `docs/specs/`, Research from `docs/research/` |
-| Output | `docs/plans/architecture-{session}.md` |
+| Output | `plans/architecture-{session}.md` |
 
 **Purpose:** Creates high-level architecture plans with design decisions, component design, and risk assessment.
 
@@ -40,8 +40,8 @@ The planning phase transforms validated requirements into executable implementat
 |-----------|-------|
 | Model | `sonnet` |
 | Tools | Read, Write, Glob, Grep |
-| Input | Architecture from `docs/plans/architecture-*.md` |
-| Output | `docs/plans/implementation-{session}.md` |
+| Input | Architecture from `plans/architecture-*.md` |
+| Output | `plans/implementation-{session}.md` |
 
 **Purpose:** Breaks down architecture into atomic, executable tasks with exact file paths, line numbers, and verification steps.
 
@@ -70,7 +70,7 @@ Requirements (docs/specs/)
 └─────────────────────┘
         │
         ▼
-Architecture Document (docs/plans/architecture-*.md)
+Architecture Document (plans/architecture-*.md)
         │
         ▼
     [User Approval]     ◄── GATE: Must approve before proceeding
@@ -81,7 +81,7 @@ Architecture Document (docs/plans/architecture-*.md)
 └─────────────────────┘
         │
         ▼
-Implementation Plan (docs/plans/implementation-*.md)
+Implementation Plan (plans/implementation-*.md)
         │
         ▼
     [User Approval]     ◄── GATE: Must approve before implementing
@@ -101,7 +101,7 @@ based on the validated requirements in docs/specs/requirements-auth.md
 ### Invoking Task Planner
 ```
 Use the task-planner sub-agent to break down the approved architecture
-in docs/plans/architecture-auth.md into implementation tasks
+in plans/architecture-auth.md into implementation tasks
 ```
 
 ## Quality Gates
@@ -118,6 +118,6 @@ in docs/plans/architecture-auth.md into implementation tasks
 
 | Document | Location |
 |----------|----------|
-| Architecture | `docs/plans/architecture-{session}.md` |
-| Implementation Plan | `docs/plans/implementation-{session}.md` |
-| Decision Records | `docs/plans/adr-{number}-{title}.md` |
+| Architecture | `plans/architecture-{session}.md` |
+| Implementation Plan | `plans/implementation-{session}.md` |
+| Decision Records | `plans/adr-{number}-{title}.md` |

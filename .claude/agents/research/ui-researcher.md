@@ -50,7 +50,7 @@ export GEMINI_API_KEY="your-gemini-key"
 # Example: Extract from Figma using the figma-analyzer skill
 python .claude/skills/figma-analyzer/scripts/figma_export.py \
   --url "$FIGMA_URL" \
-  --output docs/research/ui/
+  --output plans/research/ui/
 ```
 
 ### Phase 2: Visual Analysis (MANDATORY)
@@ -61,7 +61,7 @@ to analyze images using Claude's default vision capabilities.
 ```bash
 # Analyze layout structure
 python .claude/skills/ai-multimodal/scripts/gemini_batch_process.py \
-  --files docs/research/ui/design.png \
+  --files plans/research/ui/design.png \
   --task analyze \
   --prompt "Analyze this UI design. Extract:
     1. Overall layout structure (grid, flexbox patterns)
@@ -69,7 +69,7 @@ python .claude/skills/ai-multimodal/scripts/gemini_batch_process.py \
     3. Visual groupings and sections
     4. Responsive breakpoint hints
     5. Interactive element locations" \
-  --output docs/research/ui/layout-analysis.md \
+  --output plans/research/ui/layout-analysis.md \
   --model gemini-2.5-flash
 ```
 
@@ -78,7 +78,7 @@ python .claude/skills/ai-multimodal/scripts/gemini_batch_process.py \
 ```bash
 # Extract styling information
 python .claude/skills/ai-multimodal/scripts/gemini_batch_process.py \
-  --files docs/research/ui/design.png \
+  --files plans/research/ui/design.png \
   --task analyze \
   --prompt "Extract all design tokens from this UI:
     1. Color palette (hex values for primary, secondary, accent, text, background)
@@ -88,7 +88,7 @@ python .claude/skills/ai-multimodal/scripts/gemini_batch_process.py \
     5. Shadow styles (offset, blur, color)
     6. Icon styles and sizes
     Return as structured CSS custom properties." \
-  --output docs/research/ui/design-tokens.md \
+  --output plans/research/ui/design-tokens.md \
   --model gemini-2.5-flash
 ```
 
@@ -97,7 +97,7 @@ python .claude/skills/ai-multimodal/scripts/gemini_batch_process.py \
 ```bash
 # Document component specifications
 python .claude/skills/ai-multimodal/scripts/gemini_batch_process.py \
-  --files docs/research/ui/design.png \
+  --files plans/research/ui/design.png \
   --task analyze \
   --prompt "Document each UI component in this design:
     1. Component name and type
@@ -107,7 +107,7 @@ python .claude/skills/ai-multimodal/scripts/gemini_batch_process.py \
     5. Interaction patterns (click, hover effects)
     6. Accessibility considerations
     Return as component specification cards." \
-  --output docs/research/ui/components.md \
+  --output plans/research/ui/components.md \
   --model gemini-2.5-flash
 ```
 
@@ -118,7 +118,7 @@ Based on extracted tokens and visual analysis, generate initial CSS:
 ```bash
 # Generate CSS from design tokens
 python .claude/skills/ai-multimodal/scripts/gemini_batch_process.py \
-  --files docs/research/ui/design.png \
+  --files plans/research/ui/design.png \
   --task analyze \
   --prompt "Generate production-ready CSS code for this design:
     1. CSS custom properties for all design tokens
@@ -128,7 +128,7 @@ python .claude/skills/ai-multimodal/scripts/gemini_batch_process.py \
     5. Dark mode variations if visible
     6. Animation/transition styles
     Use modern CSS (flexbox, grid, custom properties)." \
-  --output docs/research/ui/generated-styles.css \
+  --output plans/research/ui/generated-styles.css \
   --model gemini-2.5-flash
 ```
 
@@ -137,7 +137,7 @@ python .claude/skills/ai-multimodal/scripts/gemini_batch_process.py \
 Generate comprehensive documentation in:
 
 ```
-docs/research/ui/{session-slug}/
+plans/research/ui/{session-slug}/
 ├── README.md              # Overview and quick reference
 ├── figma-metadata.json    # Raw Figma API response
 ├── design.png             # Exported design image
