@@ -19,6 +19,7 @@ workflow system for all development tasks.
 
 | Command | Location | Purpose |
 |---------|----------|---------|
+| `/initialize` | `.claude/commands/initialize.md` | Initialize new codebase with guided setup |
 | `/start` | `.claude/commands/start.md` | Execute full workflow (R→Q→P→I→V) |
 | `/research` | `.claude/commands/research.md` | Research, question, and plan phases |
 | `/execute` | `.claude/commands/execute.md` | Implementation phase |
@@ -30,6 +31,7 @@ workflow system for all development tasks.
 ### Usage
 
 ```bash
+/initialize [project-name]        # Initialize new codebase with guided setup
 /start [feature description]      # Full automated workflow
 /research [task]                  # Research + Question + Plan
 /execute [task]                   # Implementation only
@@ -116,7 +118,7 @@ All agents are defined in `.claude/agents/` directory:
 | Type | Location |
 |------|----------|
 | Research findings | `docs/research/` |
-| UI design research | `docs/research/ui/` |
+| UI design research | `plans/research/ui/` |
 | Requirements | `docs/specs/` |
 | Review reports | `docs/reviews/` |
 
