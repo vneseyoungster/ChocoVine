@@ -6,11 +6,14 @@ This directory contains custom slash commands for the development workflow.
 
 | Command | Purpose |
 |---------|---------|
+| `/initialize` | Initialize new codebase with guided setup |
 | `/start` | Execute full workflow (research → execute → validate) |
 | `/research` | Research codebase, ask questions, create approved plan |
 | `/execute` | Execute implementation from approved plan |
 | `/code-check` | Run code review, tests, security audit |
 | `/quick-fix` | Quick fix for known problems (no planning phase) |
+| `/project-scan` | Scan codebase and generate documentation |
+| `/ui-research` | Research UI designs from Figma links |
 
 ## Usage
 
@@ -200,6 +203,119 @@ or switch to `/research` + `/execute` workflow.
 
 **Auto-Commit:**
 Changes are automatically committed if tests pass and self-review is clean.
+
+---
+
+### `/initialize [project-name]`
+
+Interactive project initialization wizard that guides users through setting up a new codebase.
+
+**What It Does:**
+1. **Gathers Information** - Asks comprehensive questions about project type, tech stack, and preferences
+2. **Generates Structure** - Creates appropriate directory structure based on project type
+3. **Creates Configurations** - Generates config files (package.json, tsconfig, eslint, etc.)
+4. **Initializes Documentation** - Sets up docs/ structure with initial files
+5. **Updates CLAUDE.md** - Populates project-specific information
+
+**Question Categories:**
+- **Project Info** - Name, description, type (web app, API, library, CLI, etc.)
+- **Tech Stack** - Language, frontend/backend frameworks, database, auth
+- **Preferences** - Package manager, linting, testing, CI/CD, deployment
+- **Architecture** - Code organization, state management, API style
+
+**Example:**
+```
+/initialize
+/initialize my-awesome-app
+/initialize Create a Next.js e-commerce platform
+```
+
+**Session Artifacts Created:**
+```
+plans/sessions/{date}-initialize/
+├── session.md         # Initialization tracking
+├── answers/           # User responses by category
+└── generated/         # Configuration summaries
+```
+
+**Generated Project Structure (varies by type):**
+```
+{project-name}/
+├── src/              # Source code
+├── tests/            # Test files
+├── docs/             # Documentation
+├── .claude/          # Claude Code configuration
+└── plans/            # Planning artifacts
+```
+
+---
+
+### `/project-scan [target]`
+
+Comprehensive codebase scanner that generates layered documentation for developer onboarding.
+
+**What It Does:**
+1. **Analyzes Codebase** - Version control, structure, configurations, entry points
+2. **Detects Patterns** - Naming conventions, error handling, state management
+3. **Catalogs Dependencies** - Direct/dev dependencies with purposes
+4. **Generates Documentation** - README, architecture, walkthroughs, API docs
+
+**Example:**
+```
+/project-scan
+/project-scan ./src
+/project-scan Focus on API documentation
+```
+
+**Session Artifacts Created:**
+```
+plans/sessions/{date}-project-scan/
+├── session.md         # Scan tracking
+├── research/          # Analysis findings
+└── output/            # Generated documentation
+```
+
+**Generated Documentation:**
+```
+docs/
+├── README.md                    # Project overview
+├── architecture/overview.md     # System architecture
+├── walkthroughs/               # Entry points, data flow, patterns
+├── api/                        # API reference
+├── setup/                      # Installation & configuration
+└── onboarding/gotchas.md       # Edge cases & tips
+```
+
+---
+
+### `/ui-research [figma-url]`
+
+Analyzes Figma designs using the Gemini vision API to extract implementation-ready specifications.
+
+**What It Does:**
+1. **Fetches Design** - Uses Figma API to retrieve design frames/components
+2. **Analyzes Visually** - Uses Gemini vision to understand layout and components
+3. **Extracts Specs** - Colors, typography, spacing, component hierarchy
+4. **Generates Guide** - Implementation-ready documentation
+
+**Example:**
+```
+/ui-research https://www.figma.com/file/xxx/Design-File
+/ui-research https://www.figma.com/design/xxx/Dashboard
+```
+
+**Output:**
+```
+plans/research/ui/{design-name}/
+├── overview.md        # Design overview
+├── components/        # Component specifications
+├── styles/           # Color, typography, spacing
+└── implementation.md  # Implementation guide
+```
+
+**Prerequisites:**
+- Figma API token configured
+- Gemini API access
 
 ---
 
