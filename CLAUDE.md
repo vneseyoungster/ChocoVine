@@ -25,6 +25,7 @@ workflow system for all development tasks.
 | `/code-check` | `.claude/commands/code-check.md` | Validation phase |
 | `/quick-fix` | `.claude/commands/quick-fix.md` | Fast fixes (bug fixes, typos, config changes) |
 | `/project-scan` | `.claude/commands/project-scan.md` | Scan codebase and generate documentation |
+| `/ui-research` | `.claude/commands/ui-research.md` | Research UI designs from Figma links |
 
 ### Usage
 
@@ -35,6 +36,7 @@ workflow system for all development tasks.
 /code-check [task]                # Validation only
 /quick-fix [problem]              # Fast fixes for known problems
 /project-scan [target]            # Scan codebase, generate documentation
+/ui-research [figma-url]          # Research UI design from Figma
 ```
 
 ## Workflow Enforcement Rules
@@ -57,6 +59,7 @@ All agents are defined in `.claude/agents/` directory:
 | `backend-researcher.md` | Backend architecture | sonnet |
 | `dependency-researcher.md` | Package analysis | haiku |
 | `pattern-researcher.md` | Convention detection | sonnet |
+| `ui-researcher.md` | Figma design analysis | sonnet |
 
 ### Questioning Agents (Phase Q)
 | Agent File | Purpose | Model |
@@ -113,6 +116,7 @@ All agents are defined in `.claude/agents/` directory:
 | Type | Location |
 |------|----------|
 | Research findings | `docs/research/` |
+| UI design research | `docs/research/ui/` |
 | Requirements | `docs/specs/` |
 | Review reports | `docs/reviews/` |
 
@@ -144,6 +148,15 @@ All agents are defined in `.claude/agents/` directory:
 5. **Plan Adherence**: Follow approved plans exactly, document any deviations
 6. **Quality First**: Never skip validation phase
 7. **Session Tracking**: Use session directories for complex features
+
+## Git Commit Rules
+
+**IMPORTANT**: When creating git commits:
+- **NEVER** include "Generated with Claude Code" in commit messages
+- **NEVER** include "Co-Authored-By: Claude" or any Claude attribution
+- **NEVER** mention that Claude or AI generated/authored the code
+- Write commit messages as if a human developer wrote them
+- Focus on describing WHAT changed and WHY, not WHO/WHAT wrote it
 
 ## When User Requests Development Work
 
