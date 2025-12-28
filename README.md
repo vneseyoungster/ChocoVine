@@ -71,6 +71,16 @@ For scanning a codebase and generating comprehensive documentation:
 
 Generates layered documentation (architecture, walkthroughs, API reference, setup guides) to help developers onboard quickly.
 
+### UI Design Research
+
+For analyzing Figma designs and extracting implementation specifications:
+
+```
+/ui-research https://www.figma.com/file/ABC123/Design?node-id=1-234
+```
+
+Exports design assets, analyzes layouts with AI vision, extracts design tokens (colors, typography, spacing), and generates CSS code ready for implementation.
+
 ## What Actually Happens
 
 | Command | Phase | What Claude Does | What You Do |
@@ -82,6 +92,9 @@ Generates layered documentation (architecture, walkthroughs, API reference, setu
 | `/code-check` | **Validate** | Runs code review, tests, security audit | Confirm everything works |
 | `/project-scan` | **Understand** | Analyzes git history, structure, patterns, dependencies | Wait (comprehensive analysis) |
 | `/project-scan` | **Document** | Generates README, architecture, walkthroughs, API docs | Review generated documentation |
+| `/ui-research` | **Extract** | Exports design assets from Figma API | Provide Figma URL and access token |
+| `/ui-research` | **Analyze** | Analyzes layout, components, design tokens with AI vision | Wait (uses Gemini Vision API) |
+| `/ui-research` | **Document** | Generates design specs, CSS code, component docs | Review design documentation |
 
 ## Why This Works
 
@@ -100,6 +113,7 @@ Generates layered documentation (architecture, walkthroughs, API reference, setu
 | `/code-check [task]` | Validation | After `/execute` to run code review, tests, and security audit |
 | `/quick-fix [problem]` | Fast fixes | Bug fixes, typos, config changes where solution is known |
 | `/project-scan [target]` | Project documentation | Scan codebase and generate layered documentation for onboarding |
+| `/ui-research [figma-url]` | UI design analysis | Analyze Figma designs and extract implementation specs |
 
 ## Configuration
 
