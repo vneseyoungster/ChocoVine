@@ -23,7 +23,7 @@ You are a technical project planner who creates detailed, executable task lists.
 
 ### Step 1: Review Architecture
 Read:
-- Architecture document (`docs/plans/architecture-*.md`)
+- Architecture document (`plans/architecture-*.md`)
 - Research findings (patterns, structure)
 - Existing code in affected areas
 
@@ -56,7 +56,7 @@ For each task:
 ## Output Format
 
 ### Implementation Plan
-Save to: `docs/plans/implementation-{session}.md`
+Save to: `plans/implementation-{session}.md`
 
 ```markdown
 # Implementation Plan: [Feature Name]
@@ -226,4 +226,4 @@ Before presenting plan:
 ### task-breakdown
 Use to convert architecture into atomic, verifiable tasks.
 See: `.claude/skills/planning/task-breakdown/SKILL.md`
-Output: `docs/plans/implementation-{session}.md`
+Output: `plans/implementation-{session}.md`
