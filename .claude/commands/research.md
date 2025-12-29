@@ -13,6 +13,7 @@ The `/research` command is a **router** that directs to specialized research mod
 | Command | Purpose | Use When |
 |---------|---------|----------|
 | `/research:codebase` | Analyze codebase for implementation | Implementing features, fixing bugs, refactoring |
+| `/research:feature` | Generate failing tests first (TDD) | New features where you want tests to guide implementation |
 | `/research:ui` | Research Figma designs | Building UI from designs, extracting design tokens |
 | `/research:docs` | Research external documentation | Learning libraries, finding best practices, comparing tools |
 
@@ -37,6 +38,34 @@ The `/research` command is a **router** that directs to specialized research mod
 - Produces implementation tasks
 
 **Output:** Session in `plans/sessions/{date}-{task}/`
+
+---
+
+### `/research:feature [description]` or `/research:feature [plan-path]`
+**Purpose**: Generate failing tests before implementation (TDD approach)
+
+**Example:**
+```bash
+# Fresh start - new feature
+/research:feature Add user authentication with JWT tokens
+
+# From existing plan - add tests to plan
+/research:feature plans/sessions/2024-01-15-auth/plans/implementation.md
+```
+
+**What it does:**
+- Detects test framework and conventions
+- Brainstorms feature behavior with you
+- Identifies edge cases and error conditions
+- Generates executable failing test files
+- Verifies tests fail correctly (not syntax errors)
+
+**Why use it:**
+- Writing tests first forces thinking about edge cases BEFORE implementation
+- Tests define SHOULD behavior, preventing "testing around bugs"
+- Each passing test = verified progress
+
+**Output:** Test files in project's test directory + spec in session
 
 ---
 
@@ -83,7 +112,10 @@ The `/research` command is a **router** that directs to specialized research mod
 What are you researching?
     |
     ├── Your own codebase
-    │   └── Use /research:codebase
+    │   ├── Want tests first (TDD)?
+    │   │   └── Use /research:feature
+    │   └── Planning only?
+    │       └── Use /research:codebase
     │
     ├── UI/UX designs (Figma)
     │   └── Use /research:ui
@@ -100,7 +132,8 @@ If you run `/research` without a mode specifier:
 
 1. **Figma URL detected** → Routes to `/research:ui`
 2. **Library/framework keywords** → Routes to `/research:docs`
-3. **Implementation task** → Routes to `/research:codebase`
+3. **TDD/test-first keywords** (test, tdd, failing test, test-first) → Routes to `/research:feature`
+4. **Implementation task** → Routes to `/research:codebase`
 
 ---
 
@@ -111,6 +144,13 @@ If you run `/research` without a mode specifier:
 /research:codebase Implement dark mode toggle
 /research:codebase Add API rate limiting
 /research:codebase Refactor authentication module
+```
+
+### Feature Research (TDD)
+```bash
+/research:feature Add user registration with email verification
+/research:feature Implement shopping cart with quantity validation
+/research:feature plans/sessions/2024-01-15-auth/plans/implementation.md
 ```
 
 ### UI Research
