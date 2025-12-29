@@ -1,212 +1,38 @@
 # Claude Code Instruction
 
-## RQPIV Workflow System
+## Command Selection Guide
 
-This project uses the RQPIV (Research, Question, Plan, Implement, Validate)
-workflow system for all development tasks.
+**⚠️ CRITICAL: Always use the correct slash command. Never work directly - commands handle everything.**
 
-**⚠️ CRITICAL: All workflow execution MUST be done through slash commands. Never execute workflow phases manually - always use the commands defined in `.claude/commands/`.**
+| User Request | Command |
+|--------------|---------|
+| New feature, enhancement, significant change | `/start [description]` |
+| Bug fix, typo, config change, small fix | `/quick-fix [problem]` |
+| Need to understand codebase first | `/research:codebase [topic]` |
+| Want tests first before implementing (TDD) | `/research:feature [description]` |
+| Have a Figma design to implement | `/research:ui [figma-url]` |
+| Need external docs/library info | `/research:docs [topic]` |
+| Ready to implement (plan exists) | `/execute [task]` |
+| Validate/review existing code | `/code-check [target]` |
+| New project setup | `/initialize [project-name]` |
+| Generate project documentation | `/project-scan [target]` |
 
-## Command-Driven Architecture
+## Rules
 
-### Command Location
-```
-.claude/commands/     # All workflow commands
-.claude/agents/       # All sub-agent definitions
-```
+1. **NEVER** work directly - always invoke a command
+2. **NEVER** research, plan, or implement without a command
+3. Commands delegate to subagents - let them handle the details
 
-### Available Commands
+## Git Commits
 
-| Command | Location | Purpose |
-|---------|----------|---------|
-| `/initialize` | `.claude/commands/initialize.md` | Initialize new codebase with guided setup |
-| `/start` | `.claude/commands/start.md` | Execute full workflow (R→Q→P→I→V) |
-| `/research` | `.claude/commands/research.md` | Research router (routes to specialized modes) |
-| `/research:codebase` | `.claude/commands/research:codebase.md` | Research codebase for implementation |
-| `/research:ui` | `.claude/commands/research:ui.md` | Research UI designs from Figma |
-| `/research:docs` | `.claude/commands/research:docs.md` | Research external documentation & libraries |
-| `/execute` | `.claude/commands/execute.md` | Implementation phase |
-| `/code-check` | `.claude/commands/code-check.md` | Validation phase |
-| `/quick-fix` | `.claude/commands/quick-fix.md` | Fast fixes (bug fixes, typos, config changes) |
-| `/project-scan` | `.claude/commands/project-scan.md` | Scan codebase and generate documentation |
+When creating commits:
+- **NEVER** include "Generated with Claude Code" or AI attribution
+- Write messages as a human developer would
 
-### Usage
+## Project Info
 
-```bash
-/initialize [project-name]        # Initialize new codebase with guided setup
-/start [feature description]      # Full automated workflow
-/research [task]                  # Auto-routes to appropriate research mode
-/research:codebase [task]         # Research codebase + Question + Plan
-/research:ui [figma-url]          # Research Figma designs
-/research:docs [topic]            # Research external docs & libraries
-/execute [task]                   # Implementation only
-/code-check [task]                # Validation only
-/quick-fix [problem]              # Fast fixes for known problems
-/project-scan [target]            # Scan codebase, generate documentation
-```
-
-## Workflow Enforcement Rules
-
-1. **NEVER** execute workflow phases directly in the main context
-2. **ALWAYS** invoke the appropriate slash command to start any workflow
-3. **ALWAYS** delegate research tasks to sub-agents defined in `.claude/agents/`
-4. **NEVER** skip the command layer - commands contain critical orchestration logic
-
-## Sub-Agent Definitions
-
-All agents are defined in `.claude/agents/` directory:
-
-### Research Agents (Phase R)
-| Agent File | Purpose | Model |
-|------------|---------|-------|
-| `codebase-explorer.md` | Project structure mapping | haiku |
-| `module-researcher.md` | Deep module analysis | sonnet |
-| `frontend-researcher.md` | Frontend architecture | sonnet |
-| `backend-researcher.md` | Backend architecture | sonnet |
-| `dependency-researcher.md` | Package analysis | haiku |
-| `pattern-researcher.md` | Convention detection | sonnet |
-| `ui-researcher.md` | Figma design analysis | sonnet |
-
-### Questioning Agents (Phase Q)
-| Agent File | Purpose | Model |
-|------------|---------|-------|
-| `requirement-analyst.md` | Requirement validation | opus |
-
-### Planning Agents (Phase P)
-| Agent File | Purpose | Model |
-|------------|---------|-------|
-| `solution-architect.md` | Architecture design | opus |
-| `task-planner.md` | Task breakdown | sonnet |
-
-### Implementation Agents (Phase I)
-| Agent File | Purpose | Model |
-|------------|---------|-------|
-| `backend-developer.md` | Server-side code | sonnet |
-| `frontend-developer.md` | Client-side code | sonnet |
-| `database-specialist.md` | Database operations | sonnet |
-
-### Validation Agents (Phase V)
-| Agent File | Purpose | Model |
-|------------|---------|-------|
-| `code-reviewer.md` | Code quality | inherit |
-| `test-automator.md` | Test creation | sonnet |
-| `security-auditor.md` | Security review | sonnet |
-| `documentation-writer.md` | Documentation | haiku |
-
-### Orchestration
-| Agent File | Purpose | Model |
-|------------|---------|-------|
-| `workflow-orchestrator.md` | Phase coordination | opus |
-
-## Artifact Locations
-
-### Planning & Sessions
-| Type | Location |
-|------|----------|
-| Architecture plans | `plans/` |
-| Implementation plans | `plans/` |
-| Session data | `plans/sessions/` |
-
-### Documentation (Generated by `/project-scan`)
-| Type | Location |
-|------|----------|
-| README | `docs/README.md` or project root |
-| Architecture overview | `docs/architecture/overview.md` |
-| Entry points & data flow | `docs/walkthroughs/entry-points.md` |
-| Core patterns guide | `docs/walkthroughs/patterns.md` |
-| API reference | `docs/api/` |
-| Setup guide | `docs/setup/installation.md` |
-| Gotchas & edge cases | `docs/onboarding/gotchas.md` |
-
-### Research & Specs
-| Type | Location |
-|------|----------|
-| Research findings | `docs/research/` |
-| UI design research | `plans/research/ui/` |
-| Documentation research | `plans/research/docs/` |
-| Requirements | `docs/specs/` |
-| Review reports | `docs/reviews/` |
-
-## Quality Gates
-
-### Research → Execute
-- All research artifacts created
-- All blocking questions answered
-- Requirements document approved
-- Architecture approved by user
-- Implementation plan approved by user
-
-### Execute → Validate
-- All tasks completed
-- Deviations documented
-
-### Validate → Complete
-- Code review passed (no critical issues)
-- Tests passed
-- Security audit passed (no critical vulnerabilities)
-- Documentation updated
-
-## Best Practices
-
-1. **Command-First**: Always start with a slash command - never bypass the command layer
-2. **Context Preservation**: Commands delegate to sub-agents to keep main context clean
-3. **Documentation**: Store all findings in appropriate `docs/` directories
-4. **User Confirmation**: Never skip questioning phase - always clarify requirements
-5. **Plan Adherence**: Follow approved plans exactly, document any deviations
-6. **Quality First**: Never skip validation phase
-7. **Session Tracking**: Use session directories for complex features
-
-## Git Commit Rules
-
-**IMPORTANT**: When creating git commits:
-- **NEVER** include "Generated with Claude Code" in commit messages
-- **NEVER** include "Co-Authored-By: Claude" or any Claude attribution
-- **NEVER** mention that Claude or AI generated/authored the code
-- Write commit messages as if a human developer wrote them
-- Focus on describing WHAT changed and WHY, not WHO/WHAT wrote it
-
-## When User Requests Development Work
-
-**DO THIS:**
-```
-User: "Add a new login feature"
-→ Respond: "I'll start the RQPIV workflow for this feature."
-→ Execute: /start Add a new login feature
-```
-
-**DON'T DO THIS:**
-```
-User: "Add a new login feature"
-→ Start researching the codebase directly
-→ Start implementing without using commands
-```
-
-## Project-Specific Information
-
-### Tech Stack
-- Language: [Define your language]
-- Framework: [Define your framework]
-- Database: [Define your database]
-- Testing: [Define your test framework]
-
-### Key Directories
-- Source code: [Define source directory]
-- Tests: [Define test directory]
-- Configuration: [Define config directory]
-
-### Build Commands
-```bash
-npm install        # Install dependencies
-npm run dev        # Start development
-npm run build      # Build for production
-npm test           # Run tests
-npm run lint       # Run linting
-```
-
-### Code Conventions
-- See `docs/research/patterns-*.md` for detected patterns
-- Follow existing codebase conventions
-- Use git-workflow skill for commits and branches
-
-### Environment Setup
-[Environment-specific instructions]
+Fill in after running `/initialize` or `/project-scan`:
+- Tech Stack: [auto-detected]
+- Source: [auto-detected]
+- Tests: [auto-detected]
+- Build: `npm run dev` | `npm run build` | `npm test`
