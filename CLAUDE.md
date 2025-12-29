@@ -21,24 +21,28 @@ workflow system for all development tasks.
 |---------|----------|---------|
 | `/initialize` | `.claude/commands/initialize.md` | Initialize new codebase with guided setup |
 | `/start` | `.claude/commands/start.md` | Execute full workflow (R→Q→P→I→V) |
-| `/research` | `.claude/commands/research.md` | Research, question, and plan phases |
+| `/research` | `.claude/commands/research.md` | Research router (routes to specialized modes) |
+| `/research:codebase` | `.claude/commands/research:codebase.md` | Research codebase for implementation |
+| `/research:ui` | `.claude/commands/research:ui.md` | Research UI designs from Figma |
+| `/research:docs` | `.claude/commands/research:docs.md` | Research external documentation & libraries |
 | `/execute` | `.claude/commands/execute.md` | Implementation phase |
 | `/code-check` | `.claude/commands/code-check.md` | Validation phase |
 | `/quick-fix` | `.claude/commands/quick-fix.md` | Fast fixes (bug fixes, typos, config changes) |
 | `/project-scan` | `.claude/commands/project-scan.md` | Scan codebase and generate documentation |
-| `/ui-research` | `.claude/commands/ui-research.md` | Research UI designs from Figma links |
 
 ### Usage
 
 ```bash
 /initialize [project-name]        # Initialize new codebase with guided setup
 /start [feature description]      # Full automated workflow
-/research [task]                  # Research + Question + Plan
+/research [task]                  # Auto-routes to appropriate research mode
+/research:codebase [task]         # Research codebase + Question + Plan
+/research:ui [figma-url]          # Research Figma designs
+/research:docs [topic]            # Research external docs & libraries
 /execute [task]                   # Implementation only
 /code-check [task]                # Validation only
 /quick-fix [problem]              # Fast fixes for known problems
 /project-scan [target]            # Scan codebase, generate documentation
-/ui-research [figma-url]          # Research UI design from Figma
 ```
 
 ## Workflow Enforcement Rules
@@ -119,6 +123,7 @@ All agents are defined in `.claude/agents/` directory:
 |------|----------|
 | Research findings | `docs/research/` |
 | UI design research | `plans/research/ui/` |
+| Documentation research | `plans/research/docs/` |
 | Requirements | `docs/specs/` |
 | Review reports | `docs/reviews/` |
 

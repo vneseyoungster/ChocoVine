@@ -1,4 +1,4 @@
-# UI Research
+# Research UI
 
 Research UI design from Figma: $ARGUMENTS
 
@@ -37,7 +37,7 @@ Before running this command, ensure:
 
 Create session directory:
 ```
-docs/research/ui/{date}-{design-slug}/
+plans/research/ui/{date}-{design-slug}/
 ├── README.md              # Overview and quick reference
 ├── assets/                # Exported design images
 │   ├── design.png         # Main design export
@@ -71,7 +71,7 @@ https://www.figma.com/design/{key}/{name}?node-id={id}
 ```bash
 python .claude/skills/figma-analyzer/scripts/figma_export.py \
   --url "$FIGMA_URL" \
-  --output docs/research/ui/{session}/assets/design.png \
+  --output plans/research/ui/{session}/assets/design.png \
   --scale 2 \
   --verbose
 ```
@@ -82,7 +82,7 @@ python .claude/skills/figma-analyzer/scripts/figma_export.py \
 python .claude/skills/figma-analyzer/scripts/figma_export.py \
   --url "$FIGMA_URL" \
   --metadata-only \
-  --output docs/research/ui/{session}/figma-metadata.json
+  --output plans/research/ui/{session}/figma-metadata.json
 ```
 
 ### 4. Visual Layout Analysis
@@ -93,7 +93,7 @@ Never use Claude's default vision. Always invoke the Gemini-based ai-multimodal 
 
 ```bash
 python .claude/skills/ai-multimodal/scripts/gemini_batch_process.py \
-  --files docs/research/ui/{session}/assets/design.png \
+  --files plans/research/ui/{session}/assets/design.png \
   --task analyze \
   --prompt "Analyze this UI design comprehensively:
 
@@ -120,7 +120,7 @@ python .claude/skills/ai-multimodal/scripts/gemini_batch_process.py \
 3. Note content organization patterns
 
 Return as structured markdown with clear headings." \
-  --output docs/research/ui/{session}/layout-analysis.md \
+  --output plans/research/ui/{session}/layout-analysis.md \
   --model gemini-2.5-flash
 ```
 
@@ -128,7 +128,7 @@ Return as structured markdown with clear headings." \
 
 ```bash
 python .claude/skills/ai-multimodal/scripts/gemini_batch_process.py \
-  --files docs/research/ui/{session}/assets/design.png \
+  --files plans/research/ui/{session}/assets/design.png \
   --task analyze \
   --prompt "Extract all design tokens from this UI design:
 
@@ -172,7 +172,7 @@ For each text style:
 Format output as both:
 1. A human-readable specification table
 2. CSS custom properties code block" \
-  --output docs/research/ui/{session}/design-tokens.md \
+  --output plans/research/ui/{session}/design-tokens.md \
   --model gemini-2.5-flash
 ```
 
@@ -180,7 +180,7 @@ Format output as both:
 
 ```bash
 python .claude/skills/ai-multimodal/scripts/gemini_batch_process.py \
-  --files docs/research/ui/{session}/assets/design.png \
+  --files plans/research/ui/{session}/assets/design.png \
   --task analyze \
   --prompt "Document detailed specifications for each UI component:
 
@@ -229,7 +229,7 @@ For EACH component identified, provide:
 - Label requirements
 
 Return as detailed component specification cards." \
-  --output docs/research/ui/{session}/components.md \
+  --output plans/research/ui/{session}/components.md \
   --model gemini-2.5-flash
 ```
 
@@ -237,7 +237,7 @@ Return as detailed component specification cards." \
 
 ```bash
 python .claude/skills/ai-multimodal/scripts/gemini_batch_process.py \
-  --files docs/research/ui/{session}/assets/design.png \
+  --files plans/research/ui/{session}/assets/design.png \
   --task analyze \
   --prompt "Generate production-ready CSS code based on this design:
 
@@ -278,7 +278,7 @@ Use modern CSS:
 - :is(), :where() for efficiency
 
 Output as valid, well-commented CSS code." \
-  --output docs/research/ui/{session}/generated-styles.css \
+  --output plans/research/ui/{session}/generated-styles.css \
   --model gemini-2.5-flash
 ```
 
@@ -400,13 +400,13 @@ Before completing, verify:
 
 ```bash
 # Research a specific Figma frame
-/ui-research https://www.figma.com/file/ABC123/MyDesign?node-id=1-234
+/research:ui https://www.figma.com/file/ABC123/MyDesign?node-id=1-234
 
 # Research an entire Figma page
-/ui-research https://www.figma.com/file/ABC123/MyDesign
+/research:ui https://www.figma.com/file/ABC123/MyDesign
 
 # With additional context
-/ui-research https://www.figma.com/file/ABC123/Dashboard - Focus on the analytics cards and data visualization components
+/research:ui https://www.figma.com/file/ABC123/Dashboard - Focus on the analytics cards and data visualization components
 ```
 
 ---
@@ -423,7 +423,7 @@ Before completing, verify:
 
 ## Phase Indicator
 
-- Research UI Design
+- 🎨 Research UI Design
 
 ---
 
@@ -436,9 +436,9 @@ When research is complete:
 4. Suggest next steps (implementation planning)
 
 ```
-UI Research Complete
+✅ UI Research Complete
 
-Session: docs/research/ui/{session}/
+Session: plans/research/ui/{session}/
 
 Files Generated:
 - README.md - Overview and quick reference
@@ -449,5 +449,14 @@ Files Generated:
 - generated-styles.css - Generated CSS code
 - implementation-notes.md - Developer notes
 
-Next: Review the generated documentation and use /research or /start for implementation planning.
+Next: Review the generated documentation and use /research:codebase or /start for implementation planning.
 ```
+
+---
+
+## Related Commands
+
+- `/research:codebase` - Research codebase for implementation
+- `/research:docs` - Research external documentation and libraries
+- `/execute` - Implement the approved plan
+- `/code-check` - Validate implementation
