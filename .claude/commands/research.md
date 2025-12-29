@@ -1,360 +1,174 @@
 # Research, Question & Plan
 
-Prepare implementation for: $ARGUMENTS
+Research for: $ARGUMENTS
 
 ## Overview
 
-This command combines research, questioning, and planning into a single flow. It analyzes the codebase, clarifies requirements with the user, and produces an approved implementation plan.
+The `/research` command is a **router** that directs to specialized research modes. Each mode is optimized for different research needs.
 
 ---
 
-## Phase 1: Initialize Session
+## Research Modes
 
-### Create Session Directory
-```
-plans/sessions/{date}-{task-slug}/
-├── session.md        # Session tracking
-├── research/         # Research findings
-├── specs/            # Requirements
-├── plans/            # Architecture & tasks
-└── reviews/          # (for validation phase)
-```
-
-### Session File Template
-```markdown
-# Session: {task-name}
-
-**Started:** {date}
-**Current Phase:** 🔍 Research
-
-## Task Description
-{user request}
-
-## Research Findings
-- [ ] Codebase structure mapped
-- [ ] Patterns identified
-- [ ] Dependencies analyzed
-
-## Questions for User
-1. {question}
-
-## User Decisions
-- {decision}
-
-## Plan Summary
-{to be filled after planning}
-
-## Implementation Status
-- [ ] {task}
-
-## Validation Results
-- [ ] Code review passed
-- [ ] Tests passed
-- [ ] Security audit passed
-```
+| Command | Purpose | Use When |
+|---------|---------|----------|
+| `/research:codebase` | Analyze codebase for implementation | Implementing features, fixing bugs, refactoring |
+| `/research:ui` | Research Figma designs | Building UI from designs, extracting design tokens |
+| `/research:docs` | Research external documentation | Learning libraries, finding best practices, comparing tools |
 
 ---
 
-## Phase 2: Research
+## Quick Reference
 
-### Invoke Research Sub-Agents
+### `/research:codebase [task]`
+**Purpose**: Analyze your codebase to plan implementation
 
-Select appropriate researchers based on task type:
+**Example:**
+```bash
+/research:codebase Add user authentication with JWT tokens
+```
 
-| Task Type | Primary Researcher | Secondary |
-|-----------|-------------------|-----------|
-| New project | codebase-explorer | pattern-researcher |
-| Frontend work | frontend-researcher | pattern-researcher |
-| Backend work | backend-researcher | pattern-researcher |
-| Specific module | module-researcher | dependency-researcher |
-| Security audit | dependency-researcher | backend-researcher |
-| Refactoring | pattern-researcher | module-researcher |
+**What it does:**
+- Maps project structure
+- Identifies patterns and conventions
+- Analyzes relevant modules
+- Generates clarifying questions
+- Creates architecture plan
+- Produces implementation tasks
 
-### Research Outputs
-
-Store findings in session directory:
-- `plans/sessions/{session}/research/codebase-map.md`
-- `plans/sessions/{session}/research/patterns.md`
-- `plans/sessions/{session}/research/dependencies.md`
-
-### Research Summary
-
-Create handoff document with:
-- Key findings
-- Patterns detected
-- Constraints identified
-- Questions for user
+**Output:** Session in `plans/sessions/{date}-{task}/`
 
 ---
 
-## Phase 3: Questioning
+### `/research:ui [figma-url]`
+**Purpose**: Extract and document UI designs from Figma
 
-### Load Research Context
+**Example:**
+```bash
+/research:ui https://www.figma.com/file/ABC123/Dashboard?node-id=1-234
+```
 
-Read all findings from research phase to inform questions.
+**What it does:**
+- Exports design assets
+- Analyzes layout structure
+- Extracts design tokens (colors, typography, spacing)
+- Documents component specifications
+- Generates CSS code
 
-### Invoke Requirement Analyst
-
-Delegate to the `requirement-analyst` sub-agent with:
-- Research findings summary
-- Original user request
-- Session context
-
-The sub-agent will:
-- Parse user intent into explicit/implicit requirements
-- Identify ambiguities and gaps
-- Generate prioritized questions
-
-### Present Questions to User
-
-Display questions grouped by priority:
-
-**Must Answer (Blocking)**
-These questions must be answered before planning can begin.
-
-**Should Answer (Important)**
-These questions improve implementation quality.
-
-**Could Answer (Nice to Have)**
-These questions help optimize the solution.
-
-### Await User Responses
-
-For each question:
-- Record the user's answer
-- Or accept the default assumption
-- Note any follow-up questions
-
-### Validate Responses
-
-Check for:
-- All blocking questions addressed
-- No contradictory answers
-- Technical feasibility confirmed
-
-### Generate Requirements Document
-
-Create `plans/sessions/{session}/specs/requirements.md`:
-- Functional requirements (with IDs)
-- Non-functional requirements (with IDs)
-- Acceptance criteria (testable)
-- Assumptions confirmed
-- Out of scope items
-
-### Confirm Requirements
-
-Present validated requirements and ask:
-
-> "Here are the validated requirements based on your answers. Are these accurate? Ready to proceed to planning?"
-
-**GATE: DO NOT proceed without user confirmation**
+**Output:** Research in `plans/research/ui/{date}-{design}/`
 
 ---
 
-## Phase 4: Architecture Planning
+### `/research:docs [topic]`
+**Purpose**: Research external documentation and libraries
 
-### Load Context
-
-Read and analyze:
-1. Requirements document
-2. Research findings
-3. User answers
-4. Session context
-
-### Invoke Solution Architect
-
-Delegate to `solution-architect` sub-agent to:
-- Design high-level solution architecture
-- Make technology and pattern decisions
-- Identify risks and mitigation strategies
-- Create architecture document
-
-**Output:** `plans/sessions/{session}/plans/architecture.md`
-
-### Present Architecture for Review
-
-```
-📋 ARCHITECTURE REVIEW
-
-## Key Design Decisions
-[Summary of major decisions]
-
-## Components
-[List of components and responsibilities]
-
-## Identified Risks
-[Risk summary with mitigations]
-
-## Open Questions
-[Any questions needing user input]
-
----
-Full architecture document: plans/sessions/{session}/plans/architecture.md
+**Example:**
+```bash
+/research:docs How to use Expo with React Native
 ```
 
-### Architecture Approval Gate
+**What it does:**
+- Searches llms.txt via context7.com
+- Analyzes GitHub repositories
+- Aggregates documentation
+- Produces comprehensive report
 
-**🚫 GATE: DO NOT proceed without explicit user approval**
-
-Ask user:
-> "Please review the architecture above. Do you approve this design, or do you have changes/questions?"
-
-**If approved:** Proceed to task breakdown
-**If changes needed:** Update architecture and present again
-**If questions:** Answer questions and present again
+**Output:** Research in `plans/research/docs/{date}-{topic}/`
 
 ---
 
-## Phase 5: Task Breakdown
-
-### Invoke Task Planner
-
-After architecture approval, delegate to `task-planner` sub-agent to:
-- Break architecture into atomic tasks
-- Add exact file paths and line numbers
-- Define verification for each task
-- Establish dependencies and order
-
-**Output:** `plans/sessions/{session}/plans/implementation.md`
-
-### Present Implementation Plan
+## Mode Selection Guide
 
 ```
-📝 IMPLEMENTATION PLAN
-
-## Summary
-- Total Tasks: [N]
-- Phases: [N]
-- Risk Level: [High/Medium/Low]
-
-## Phase Breakdown
-[Phase 1: N tasks]
-[Phase 2: N tasks]
-...
-
-## Critical Path
-[List of P1 tasks that must complete first]
-
-## Verification Commands
-[Key commands that will be run]
-
----
-Full implementation plan: plans/sessions/{session}/plans/implementation.md
-```
-
-### Plan Approval Gate
-
-**🚫 GATE: DO NOT proceed to implementation without explicit approval**
-
-Ask user:
-> "Please review the implementation plan above. Ready to proceed with implementation?"
-
-**If approved:** Research phase complete. Ready for `/execute`
-**If changes needed:** Update plan and present again
-
----
-
-## Quality Checklist
-
-Before completing this phase:
-- [ ] Session directory created
-- [ ] Research findings documented
-- [ ] All blocking questions answered
-- [ ] Requirements document created
-- [ ] Architecture document addresses all requirements
-- [ ] All major decisions have documented rationale
-- [ ] Risks identified with mitigations
-- [ ] Tasks are atomic and verifiable
-- [ ] File paths and line numbers specified
-- [ ] Dependencies clearly marked
-- [ ] Verification commands included
-- [ ] User has approved both architecture and plan
-
----
-
-## Phase Transition
-
-**On completion:**
-1. Update session tracking with status
-2. Archive all artifacts
-3. Announce: "Research & planning complete. Ready for `/execute`"
-
----
-
-## Phase Indicators
-
-- 🔍 Research (in progress)
-- ❓ Questioning (in progress)
-- 📋 Planning (in progress)
-- 🔨 Implementation (next: `/execute`)
-- ✅ Validation (pending: `/code-check`)
-
----
-
-## Error Handling
-
-### If research fails
-```
-Research could not complete for this task.
-Gap identified: [description]
-Please provide guidance or additional context.
-```
-
-### If user skips blocking questions
-```
-The following blocking questions must be answered before planning:
-1. [Question]
-2. [Question]
-
-Please provide answers or accept the default assumptions.
-```
-
-### If contradictions detected
-```
-Potential contradictions found in your requirements:
-- [Contradiction 1]
-- [Contradiction 2]
-
-Please clarify which approach you prefer.
+What are you researching?
+    |
+    ├── Your own codebase
+    │   └── Use /research:codebase
+    │
+    ├── UI/UX designs (Figma)
+    │   └── Use /research:ui
+    │
+    └── External libraries/frameworks
+        └── Use /research:docs
 ```
 
 ---
 
-## Example Usage
+## Default Behavior
+
+If you run `/research` without a mode specifier:
+
+1. **Figma URL detected** → Routes to `/research:ui`
+2. **Library/framework keywords** → Routes to `/research:docs`
+3. **Implementation task** → Routes to `/research:codebase`
+
+---
+
+## Examples
+
+### Codebase Research
+```bash
+/research:codebase Implement dark mode toggle
+/research:codebase Add API rate limiting
+/research:codebase Refactor authentication module
+```
+
+### UI Research
+```bash
+/research:ui https://www.figma.com/file/ABC123/LoginScreen
+/research:ui https://www.figma.com/design/XYZ789/Dashboard?node-id=0-1
+```
+
+### Documentation Research
+```bash
+/research:docs How to setup Prisma with Next.js 14
+/research:docs Compare Zustand vs Jotai for state management
+/research:docs React Query v5 caching strategies
+```
+
+---
+
+## Combining Research Modes
+
+For complex features, you may need multiple research modes:
+
+**Example: Building a new dashboard feature**
+
+```bash
+# 1. Research the UI design
+/research:ui https://www.figma.com/file/ABC123/Dashboard
+
+# 2. Research the charting library
+/research:docs Recharts vs Chart.js for React dashboards
+
+# 3. Research codebase for implementation
+/research:codebase Implement dashboard with analytics charts
+```
+
+---
+
+## Workflow Integration
+
+Research commands integrate with the RQPIV workflow:
 
 ```
-/research Add user authentication with JWT tokens
-
-Output:
-🔍 Starting Research Phase...
-
-Invoking research sub-agents...
-- backend-researcher: Analyzing API structure
-- pattern-researcher: Detecting authentication patterns
-
-Research complete. Key findings:
-- Express.js backend with middleware pattern
-- No existing auth implementation
-- bcrypt and jsonwebtoken available in dependencies
-
-❓ Entering Questioning Phase...
-
-**Must Answer (Blocking)**
-
-Q1: Should authentication use JWT tokens or session-based cookies?
-- Impact: Affects security model and state management
-- Default: JWT tokens (stateless, better for APIs)
-
-Q2: Which OAuth providers should be supported?
-- Impact: Determines third-party integrations needed
-- Options: Google, GitHub, Microsoft, None
-- Default: None (email/password only)
-
-**Should Answer (Important)**
-
-Q3: Should failed login attempts be rate-limited?
-- Impact: Security hardening
-- Default: Yes, 5 attempts per 15 minutes
-
-Please answer these questions to proceed with planning.
+/research:*        → Research & Question phases
+     ↓
+/execute           → Implementation phase
+     ↓
+/code-check        → Validation phase
 ```
+
+Or use `/start` for the full automated workflow.
+
+---
+
+## Related Commands
+
+| Command | Purpose |
+|---------|---------|
+| `/start` | Full workflow (Research → Execute → Validate) |
+| `/execute` | Implementation phase |
+| `/code-check` | Validation phase |
+| `/quick-fix` | Fast fixes without full workflow |
+| `/project-scan` | Generate codebase documentation |
