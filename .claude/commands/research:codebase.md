@@ -4,253 +4,233 @@ Analyze codebase for: $ARGUMENTS
 
 ## Overview
 
-This command performs comprehensive codebase research for implementation planning. It analyzes the project structure, patterns, dependencies, and relevant modules to understand how to implement a feature or fix.
+This command is **Phase 1** of the research flow. It performs comprehensive codebase research to understand existing code, patterns, and architecture before any planning or implementation.
+
+**This phase focuses ONLY on understanding. No planning, no questions, no implementation.**
+
+---
+
+## Phase Flow Position
+
+```
+┌─────────────────────┐
+│  /research:codebase │  ← YOU ARE HERE (Phase 1)
+└──────────┬──────────┘
+           │
+           ▼
+┌─────────────────────┐
+│  /research:feature  │  ← Phase 2 (Next)
+└──────────┬──────────┘
+           │
+           ▼
+┌─────────────────────┐
+│   /research:plan    │  ← Phase 3
+└─────────────────────┘
+```
+
+---
+
+## CRITICAL: Agent-First Research
+
+**The main agent MUST NOT perform research directly.** All research work MUST be delegated to specialized research sub-agents to reduce context length.
+
+### Mandatory Agent Delegation
+
+1. **ALWAYS** invoke research sub-agents for codebase analysis
+2. **NEVER** use Grep, Glob, or Read tools directly for research in the main context
+3. **WAIT** for agent outputs before proceeding
+4. **ONLY** read the summarized findings from agent outputs
+
+### Why Agent-First?
+
+- Reduces main agent context usage significantly
+- Specialized agents have focused prompts for their domain
+- Research artifacts are saved to disk for later reference
+- Main agent only needs summaries, not raw search results
 
 ---
 
 ## Phase 1: Initialize Session
 
 ### Create Session Directory
+
 ```
 plans/sessions/{date}-{task-slug}/
 ├── session.md        # Session tracking
-├── research/         # Research findings
-├── specs/            # Requirements
-├── plans/            # Architecture & tasks
+├── research/         # Research findings (this phase)
+├── specs/            # Requirements (Phase 2)
+├── plans/            # Architecture & tasks (Phase 2)
 └── reviews/          # (for validation phase)
 ```
 
 ### Session File Template
+
 ```markdown
 # Session: {task-name}
 
 **Started:** {date}
-**Current Phase:** 🔍 Research
+**Current Phase:** 🔍 Codebase Research
 
 ## Task Description
 {user request}
 
-## Research Findings
+## Research Status
 - [ ] Codebase structure mapped
 - [ ] Patterns identified
 - [ ] Dependencies analyzed
 
-## Questions for User
-1. {question}
-
-## User Decisions
-- {decision}
-
-## Plan Summary
-{to be filled after planning}
-
-## Implementation Status
-- [ ] {task}
-
-## Validation Results
-- [ ] Code review passed
-- [ ] Tests passed
-- [ ] Security audit passed
+## Phase Progress
+- [x] Phase 1: Codebase Research ← Current
+- [ ] Phase 2: Test Specification
+- [ ] Phase 3: Architecture Planning
+- [ ] Phase 4: Implementation
+- [ ] Phase 5: Validation
 ```
 
 ---
 
-## Phase 2: Research
+## Phase 2: Research (Agent-Only)
 
-### Invoke Research Sub-Agents
+### CRITICAL: Delegate ALL Research to Sub-Agents
+
+**DO NOT perform any research directly in the main agent context.**
+
+Use the Task tool to invoke research sub-agents. The main agent should:
+1. Launch research agents IN PARALLEL using Task tool
+2. Wait for agent completion
+3. Read only the output summaries - do not re-research
+
+### Agent Selection Matrix
 
 Select appropriate researchers based on task type:
 
-| Task Type | Primary Researcher | Secondary |
-|-----------|-------------------|-----------|
-| New project | codebase-explorer | pattern-researcher |
-| Frontend work | frontend-researcher | pattern-researcher |
-| Backend work | backend-researcher | pattern-researcher |
-| Specific module | module-researcher | dependency-researcher |
-| Security audit | dependency-researcher | backend-researcher |
-| Refactoring | pattern-researcher | module-researcher |
+| Task Type | Primary Agent | Secondary Agent | Launch In Parallel |
+|-----------|---------------|-----------------|-------------------|
+| New project | codebase-explorer | pattern-researcher | Yes |
+| Frontend work | frontend-researcher | pattern-researcher | Yes |
+| Backend work | backend-researcher | pattern-researcher | Yes |
+| Specific module | module-researcher | dependency-researcher | Yes |
+| Security audit | dependency-researcher | backend-researcher | Yes |
+| Refactoring | pattern-researcher | module-researcher | Yes |
+
+### Agent Invocation Template
+
+```
+Launch Task tool with:
+- subagent_type: [researcher-type]
+- prompt: "Research [specific aspect] for: $ARGUMENTS
+
+  Save findings to: plans/sessions/{session}/research/[output-file].md
+
+  Focus on:
+  - [specific research goals]
+  - [patterns to identify]
+  - [constraints to document]"
+```
 
 ### Research Outputs
 
-Store findings in session directory:
+Agents will store findings in session directory:
 - `plans/sessions/{session}/research/codebase-map.md`
 - `plans/sessions/{session}/research/patterns.md`
 - `plans/sessions/{session}/research/dependencies.md`
 
-### Research Summary
-
-Create handoff document with:
-- Key findings
-- Patterns detected
-- Constraints identified
-- Questions for user
-
 ---
 
-## Phase 3: Questioning
+## Phase 3: Compile Findings
 
-### Load Research Context
+### After Agents Complete
 
-Read all findings from research phase to inform questions.
+Read ONLY the summary sections from agent outputs:
+1. Load `research/codebase-map.md` - read summary
+2. Load `research/patterns.md` - read key patterns
+3. Load `research/dependencies.md` - read constraints
 
-### Invoke Requirement Analyst
+**DO NOT re-search or expand on agent findings. Trust the agent outputs.**
 
-Delegate to the `requirement-analyst` sub-agent with:
-- Research findings summary
-- Original user request
-- Session context
+### Create Research Summary
 
-The sub-agent will:
-- Parse user intent into explicit/implicit requirements
-- Identify ambiguities and gaps
-- Generate prioritized questions
+Create `plans/sessions/{session}/research/summary.md`:
 
-### Present Questions to User
+```markdown
+# Research Summary: [Task Name]
 
-Display questions grouped by priority:
+## Project Overview
+- Type: [webapp, library, CLI, etc.]
+- Stack: [languages, frameworks]
+- Size: [small/medium/large]
 
-**Must Answer (Blocking)**
-These questions must be answered before planning can begin.
+## Key Findings
 
-**Should Answer (Important)**
-These questions improve implementation quality.
+### Codebase Structure
+[Summary from codebase-map.md]
 
-**Could Answer (Nice to Have)**
-These questions help optimize the solution.
+### Patterns Detected
+[Summary from patterns.md]
+- Naming conventions: ...
+- File organization: ...
+- Coding style: ...
 
-### Await User Responses
+### Dependencies & Constraints
+[Summary from dependencies.md]
+- Key dependencies: ...
+- Version constraints: ...
+- Compatibility notes: ...
 
-For each question:
-- Record the user's answer
-- Or accept the default assumption
-- Note any follow-up questions
+### Integration Points
+[Where new code will connect to existing code]
 
-### Validate Responses
+### Potential Challenges
+[Identified obstacles or complexities]
 
-Check for:
-- All blocking questions addressed
-- No contradictory answers
-- Technical feasibility confirmed
-
-### Generate Requirements Document
-
-Create `plans/sessions/{session}/specs/requirements.md`:
-- Functional requirements (with IDs)
-- Non-functional requirements (with IDs)
-- Acceptance criteria (testable)
-- Assumptions confirmed
-- Out of scope items
-
-### Confirm Requirements
-
-Present validated requirements and ask:
-
-> "Here are the validated requirements based on your answers. Are these accurate? Ready to proceed to planning?"
-
-**GATE: DO NOT proceed without user confirmation**
-
----
-
-## Phase 4: Architecture Planning
-
-### Load Context
-
-Read and analyze:
-1. Requirements document
-2. Research findings
-3. User answers
-4. Session context
-
-### Invoke Solution Architect
-
-Delegate to `solution-architect` sub-agent to:
-- Design high-level solution architecture
-- Make technology and pattern decisions
-- Identify risks and mitigation strategies
-- Create architecture document
-
-**Output:** `plans/sessions/{session}/plans/architecture.md`
-
-### Present Architecture for Review
-
-```
-📋 ARCHITECTURE REVIEW
-
-## Key Design Decisions
-[Summary of major decisions]
-
-## Components
-[List of components and responsibilities]
-
-## Identified Risks
-[Risk summary with mitigations]
-
-## Open Questions
-[Any questions needing user input]
-
----
-Full architecture document: plans/sessions/{session}/plans/architecture.md
+## Ready for Test Specification
+This research is ready for `/research:feature` to gather requirements and generate tests.
 ```
 
-### Architecture Approval Gate
-
-**🚫 GATE: DO NOT proceed without explicit user approval**
-
-Ask user:
-> "Please review the architecture above. Do you approve this design, or do you have changes/questions?"
-
-**If approved:** Proceed to task breakdown
-**If changes needed:** Update architecture and present again
-**If questions:** Answer questions and present again
-
 ---
 
-## Phase 5: Task Breakdown
+## Phase 4: Complete
 
-### Invoke Task Planner
+### Update Session Tracking
 
-After architecture approval, delegate to `task-planner` sub-agent to:
-- Break architecture into atomic tasks
-- Add exact file paths and line numbers
-- Define verification for each task
-- Establish dependencies and order
+Update `session.md`:
+```markdown
+**Current Phase:** Research Complete
 
-**Output:** `plans/sessions/{session}/plans/implementation.md`
+## Research Complete
+- [x] Codebase structure mapped
+- [x] Patterns identified
+- [x] Dependencies analyzed
 
-### Present Implementation Plan
+## Artifacts
+- research/codebase-map.md
+- research/patterns.md
+- research/dependencies.md
+- research/summary.md
 
-```
-📝 IMPLEMENTATION PLAN
-
-## Summary
-- Total Tasks: [N]
-- Phases: [N]
-- Risk Level: [High/Medium/Low]
-
-## Phase Breakdown
-[Phase 1: N tasks]
-[Phase 2: N tasks]
-...
-
-## Critical Path
-[List of P1 tasks that must complete first]
-
-## Verification Commands
-[Key commands that will be run]
-
----
-Full implementation plan: plans/sessions/{session}/plans/implementation.md
+## Ready For
+- `/research:feature` to gather requirements and generate test specifications
 ```
 
-### Plan Approval Gate
+### Announce Completion
 
-**🚫 GATE: DO NOT proceed to implementation without explicit approval**
+```
+CODEBASE RESEARCH COMPLETE
 
-Ask user:
-> "Please review the implementation plan above. Ready to proceed with implementation?"
+Session: plans/sessions/{date}-{task}/
 
-**If approved:** Research phase complete. Ready for `/execute`
-**If changes needed:** Update plan and present again
+Research Findings:
+├── research/codebase-map.md   ✓
+├── research/patterns.md       ✓
+├── research/dependencies.md   ✓
+└── research/summary.md        ✓
+
+Key Findings:
+- [1-2 sentence summary of most important findings]
+
+Next Step:
+→ /research:feature [session-path] - Gather requirements and generate tests
+```
 
 ---
 
@@ -258,36 +238,13 @@ Ask user:
 
 Before completing this phase:
 - [ ] Session directory created
-- [ ] Research findings documented
-- [ ] All blocking questions answered
-- [ ] Requirements document created
-- [ ] Architecture document addresses all requirements
-- [ ] All major decisions have documented rationale
-- [ ] Risks identified with mitigations
-- [ ] Tasks are atomic and verifiable
-- [ ] File paths and line numbers specified
-- [ ] Dependencies clearly marked
-- [ ] Verification commands included
-- [ ] User has approved both architecture and plan
-
----
-
-## Phase Transition
-
-**On completion:**
-1. Update session tracking with status
-2. Archive all artifacts
-3. Announce: "Codebase research & planning complete. Ready for `/execute`"
-
----
-
-## Phase Indicators
-
-- 🔍 Research (in progress)
-- ❓ Questioning (in progress)
-- 📋 Planning (in progress)
-- 🔨 Implementation (next: `/execute`)
-- ✅ Validation (pending: `/code-check`)
+- [ ] All research agents completed
+- [ ] codebase-map.md exists
+- [ ] patterns.md exists
+- [ ] dependencies.md exists
+- [ ] summary.md compiled
+- [ ] No questions asked (save for Phase 2)
+- [ ] No planning done (save for Phase 2)
 
 ---
 
@@ -300,22 +257,11 @@ Gap identified: [description]
 Please provide guidance or additional context.
 ```
 
-### If user skips blocking questions
+### If no relevant code found
 ```
-The following blocking questions must be answered before planning:
-1. [Question]
-2. [Question]
-
-Please provide answers or accept the default assumptions.
-```
-
-### If contradictions detected
-```
-Potential contradictions found in your requirements:
-- [Contradiction 1]
-- [Contradiction 2]
-
-Please clarify which approach you prefer.
+No existing code found related to: [task]
+This appears to be a greenfield implementation.
+Proceeding with minimal research findings.
 ```
 
 ---
@@ -328,42 +274,36 @@ Please clarify which approach you prefer.
 Output:
 🔍 Starting Codebase Research Phase...
 
+Creating session: plans/sessions/2024-01-15-auth/
+
 Invoking research sub-agents...
 - backend-researcher: Analyzing API structure
 - pattern-researcher: Detecting authentication patterns
 
+[Agents complete]
+
 Research complete. Key findings:
 - Express.js backend with middleware pattern
 - No existing auth implementation
-- bcrypt and jsonwebtoken available in dependencies
+- bcrypt and jsonwebtoken in package.json
+- Routes follow /api/v1/{resource} pattern
 
-❓ Entering Questioning Phase...
+Session: plans/sessions/2024-01-15-auth/
+├── research/codebase-map.md   ✓
+├── research/patterns.md       ✓
+├── research/dependencies.md   ✓
+└── research/summary.md        ✓
 
-**Must Answer (Blocking)**
-
-Q1: Should authentication use JWT tokens or session-based cookies?
-- Impact: Affects security model and state management
-- Default: JWT tokens (stateless, better for APIs)
-
-Q2: Which OAuth providers should be supported?
-- Impact: Determines third-party integrations needed
-- Options: Google, GitHub, Microsoft, None
-- Default: None (email/password only)
-
-**Should Answer (Important)**
-
-Q3: Should failed login attempts be rate-limited?
-- Impact: Security hardening
-- Default: Yes, 5 attempts per 15 minutes
-
-Please answer these questions to proceed with planning.
+Next: /research:feature plans/sessions/2024-01-15-auth/
 ```
 
 ---
 
 ## Related Commands
 
-- `/research:ui` - Research UI designs from Figma
-- `/research:docs` - Research external documentation and libraries
-- `/execute` - Implement the approved plan
-- `/code-check` - Validate implementation
+| Command | Purpose |
+|---------|---------|
+| `/research:feature` | Phase 2: Requirements & test specification |
+| `/research:plan` | Phase 3: Architecture & planning |
+| `/research:ui` | Standalone: Figma design research |
+| `/research:docs` | Standalone: External documentation |

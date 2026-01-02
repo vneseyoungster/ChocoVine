@@ -8,16 +8,46 @@ This directory contains custom slash commands for the development workflow.
 |---------|---------|
 | `/initialize` | Initialize new codebase with guided setup |
 | `/start` | Execute full workflow (research → execute → validate) |
-| `/research` | Research codebase, ask questions, create approved plan |
+| `/research` | Router to specialized research modes |
+| `/research:codebase` | Phase 1: Analyze codebase for patterns & structure |
+| `/research:feature` | Phase 2: Requirements & test specifications (TDD) |
+| `/research:plan` | Phase 3: Architecture & implementation planning |
+| `/research:ui` | Research UI designs from Figma links |
+| `/research:docs` | Research external documentation & libraries |
 | `/execute` | Execute implementation from approved plan |
 | `/code-check` | Run code review, tests, security audit |
 | `/quick-fix` | Quick fix for known problems (no planning phase) |
 | `/project-scan` | Scan codebase and generate documentation |
-| `/ui-research` | Research UI designs from Figma links |
 
 ## Usage
 
 Slash commands are invoked by typing `/command-name` in Claude Code.
+
+---
+
+## Research Flow
+
+The research phase follows a sequential 3-phase flow for implementation tasks (TDD approach):
+
+```
+┌─────────────────────┐
+│  /research:codebase │  ← Phase 1: Understand existing code & patterns
+└──────────┬──────────┘
+           │
+           ▼
+┌─────────────────────┐
+│  /research:feature  │  ← Phase 2: Requirements & test specification (TDD)
+└──────────┬──────────┘
+           │
+           ▼
+┌─────────────────────┐
+│   /research:plan    │  ← Phase 3: Architecture & implementation planning
+└─────────────────────┘
+```
+
+**Standalone modes** (not part of sequential flow):
+- `/research:ui` - Figma design research
+- `/research:docs` - External documentation research
 
 ---
 
@@ -55,30 +85,189 @@ plans/sessions/{date}-{slug}/
 
 ### `/research [task description]`
 
-Combines research, questioning, and planning into one phase:
+**Router command** that directs to specialized research modes based on context:
 
-1. Creates session directory structure
-2. Invokes appropriate research sub-agents
-3. Generates clarifying questions (prioritized)
-4. Presents questions to user and records answers
-5. Creates architecture design (requires approval)
-6. Creates implementation plan (requires approval)
+| Detected | Routes To |
+|----------|-----------|
+| Figma URL | `/research:ui` |
+| Library/framework keywords | `/research:docs` |
+| Session/plan path | Appropriate next phase |
+| Implementation task | `/research:codebase` |
 
 **Example:**
 ```
 /research Add user authentication
 ```
 
+---
+
+### `/research:codebase [task description]`
+
+**Phase 1: Codebase Research** - Analyzes existing code to understand patterns and structure.
+
+**What It Does:**
+1. Creates session directory structure
+2. Invokes research sub-agents in parallel
+3. Maps project structure and conventions
+4. Identifies integration points
+5. Documents patterns and dependencies
+
+**Example:**
+```
+/research:codebase Add user authentication with JWT tokens
+```
+
 **Output:**
-- `plans/sessions/{session}/research/` - Research findings
-- `plans/sessions/{session}/specs/requirements.md` - Requirements
-- `plans/sessions/{session}/plans/architecture.md` - Architecture
-- `plans/sessions/{session}/plans/implementation.md` - Task breakdown
+```
+plans/sessions/{date}-{task}/
+├── session.md
+└── research/
+    ├── codebase-map.md
+    ├── patterns.md
+    ├── dependencies.md
+    └── summary.md
+```
+
+**Next Step:** `/research:feature [session-path]`
+
+---
+
+### `/research:feature [task description]` or `/research:feature [session-path]`
+
+**Phase 2: Requirements & Test Specification (TDD)** - Gathers requirements and generates failing tests.
+
+**Prerequisites:** `/research:codebase` completed (auto-invokes if missing)
+
+**What It Does:**
+1. Loads codebase research findings
+2. Engages in brainstorming dialogue with user
+3. Generates clarifying questions (prioritized)
+4. Creates requirements document
+5. Detects test framework and conventions
+6. Maps requirements to test cases
+7. Generates executable failing test files
+8. Verifies tests fail correctly (not syntax errors)
+
+**Example:**
+```
+# Fresh start (auto-runs Phase 1 first)
+/research:feature Add user authentication
+
+# From existing session
+/research:feature plans/sessions/2024-01-15-auth/
+```
+
+**Output:**
+```
+plans/sessions/{date}-{task}/
+├── research/
+│   └── test-patterns.md
+├── specs/
+│   ├── requirements.md
+│   └── test-specification.md
+└── (test files in project's test directory)
+```
 
 **Quality Gates:**
 - All blocking questions answered
+- Requirements approved by user
+- Test specification approved by user
+- All test files created
+- Tests fail correctly (missing implementation, not errors)
+
+**Next Step:** `/research:plan [session-path]`
+
+---
+
+### `/research:plan [task description]` or `/research:plan [session-path]`
+
+**Phase 3: Architecture & Planning** - Creates architecture and implementation plan to make tests pass.
+
+**Prerequisites:** `/research:feature` completed (auto-invokes if missing)
+
+**What It Does:**
+1. Loads test specification and requirements
+2. Designs architecture to satisfy tests
+3. Maps components to test suites
+4. Creates implementation plan with explicit test mappings
+5. Each task references which tests it will make pass
+
+**Example:**
+```
+# Fresh start (auto-runs Phase 1 & 2 first)
+/research:plan Add user authentication
+
+# From existing session
+/research:plan plans/sessions/2024-01-15-auth/
+```
+
+**Output:**
+```
+plans/sessions/{date}-{task}/
+└── plans/
+    ├── architecture.md
+    └── implementation.md  (with test mappings)
+```
+
+**Quality Gates:**
+- Test specification exists
 - Architecture approval required
 - Implementation plan approval required
+- Each task maps to specific test IDs
+
+**Next Step:** `/execute [session-path]`
+
+---
+
+### `/research:ui [figma-url]`
+
+**Standalone: UI Design Research** - Analyzes Figma designs for implementation.
+
+**What It Does:**
+1. Fetches design from Figma API
+2. Analyzes visually with Gemini vision
+3. Extracts colors, typography, spacing
+4. Documents component specifications
+5. Generates implementation guide
+
+**Example:**
+```
+/research:ui https://www.figma.com/file/xxx/Design-File
+/research:ui https://www.figma.com/design/xxx/Dashboard
+```
+
+**Output:**
+```
+plans/research/ui/{design-name}/
+├── overview.md
+├── components/
+├── styles/
+└── implementation.md
+```
+
+---
+
+### `/research:docs [topic]`
+
+**Standalone: Documentation Research** - Researches external libraries and documentation.
+
+**What It Does:**
+1. Searches llms.txt via context7.com
+2. Analyzes GitHub repositories
+3. Aggregates documentation
+4. Produces comprehensive report
+
+**Example:**
+```
+/research:docs How to use Expo with React Native
+/research:docs Compare Zustand vs Jotai for state management
+```
+
+**Output:**
+```
+plans/research/docs/{date}-{topic}/
+└── research-report.md
+```
 
 ---
 
@@ -86,7 +275,7 @@ Combines research, questioning, and planning into one phase:
 
 Executes the implementation phase:
 
-1. Loads implementation plan from `/research` phase
+1. Loads implementation plan from research phase
 2. Routes tasks to appropriate developer sub-agents
 3. Executes tasks in order with verification
 4. Commits after each task completion
@@ -94,12 +283,13 @@ Executes the implementation phase:
 6. Handles deviations appropriately
 
 **Prerequisites:**
-- `/research` phase completed
+- Research phase completed (any of the 3 phases)
 - Architecture and implementation plan approved
 
 **Example:**
 ```
 /execute Add user authentication
+/execute plans/sessions/2024-01-15-auth/
 ```
 
 **Sub-Agent Routing:**
@@ -288,34 +478,37 @@ docs/
 
 ---
 
-### `/ui-research [figma-url]`
+## Workflow Summary
 
-Analyzes Figma designs using the Gemini vision API to extract implementation-ready specifications.
-
-**What It Does:**
-1. **Fetches Design** - Uses Figma API to retrieve design frames/components
-2. **Analyzes Visually** - Uses Gemini vision to understand layout and components
-3. **Extracts Specs** - Colors, typography, spacing, component hierarchy
-4. **Generates Guide** - Implementation-ready documentation
-
-**Example:**
+### Full Workflow (Recommended)
 ```
-/ui-research https://www.figma.com/file/xxx/Design-File
-/ui-research https://www.figma.com/design/xxx/Dashboard
+/start [description]
+  └── Handles everything automatically
 ```
 
-**Output:**
+### Manual Sequential Flow (TDD)
 ```
-plans/research/ui/{design-name}/
-├── overview.md        # Design overview
-├── components/        # Component specifications
-├── styles/           # Color, typography, spacing
-└── implementation.md  # Implementation guide
+/research:codebase [task]    → Phase 1: Understand code
+       ↓
+/research:feature [session]  → Phase 2: Requirements & failing tests
+       ↓
+/research:plan [session]     → Phase 3: Plan to make tests pass
+       ↓
+/execute [session]           → Implement (make tests pass)
+       ↓
+/code-check [session]        → Validate
 ```
 
-**Prerequisites:**
-- Figma API token configured
-- Gemini API access
+### Quick Path (Skip Planning)
+```
+/research:codebase [task]    → Phase 1: Understand code
+       ↓
+/research:feature [session]  → Phase 2: Requirements & tests
+       ↓
+/execute [session]           → Implement directly
+       ↓
+/code-check [session]        → Validate
+```
 
 ---
 
