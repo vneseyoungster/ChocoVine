@@ -27,19 +27,31 @@ Initialize session tracking file with:
 - Start timestamp
 - Phase progress table
 
-### 2. Research & Planning Phase
+### 2. Research & Planning Phase (Agent-First)
 
-**Invoke:** `/research`
+**CRITICAL: Invoke `/research:codebase` with the user's task description:**
 
-This combined phase handles:
-1. Research codebase with appropriate sub-agents
+```
+/research:codebase $ARGUMENTS
+```
+
+This command will:
+1. **Delegate ALL research to specialized sub-agents** (reduces main agent context)
 2. Generate and present clarifying questions
 3. Await user answers
 4. Create architecture design (requires approval)
 5. Create implementation plan (requires approval)
 
+**DO NOT perform any research directly in the main agent context.** The `/research:codebase` command handles all research through sub-agents.
+
+**Context Efficiency Note:**
+If user references existing files/artifacts in their request (e.g., "@/research", "based on the plan we made"), invoke summarize-agent first to get compressed context before delegating to /research:codebase:
+```
+Task(summarize-agent, "Summarize: [referenced paths]")
+```
+
 **Gates:**
-- Research findings documented
+- Research findings documented (by sub-agents)
 - All blocking questions answered
 - Architecture approved by user
 - Implementation plan approved by user

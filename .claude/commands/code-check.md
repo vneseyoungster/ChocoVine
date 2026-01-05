@@ -2,10 +2,49 @@
 
 Run validation for: $ARGUMENTS
 
-## Prerequisites Check
+## Prerequisites Check (HARD BLOCK)
+
+**CRITICAL: Full Workflow Required. No exceptions.**
+
+### Required Prerequisites
+
+- [ ] `/research:codebase` was invoked (patterns documented)
 - [ ] Implementation phase completed (`/execute`)
 - [ ] All tasks marked complete
 - [ ] No pending deviations
+- [ ] Session directory exists with artifacts
+
+### Prerequisite Verification
+
+Before proceeding, verify:
+
+```
+Check: plans/sessions/{session}/research/patterns.md
+Check: plans/sessions/{session}/plans/implementation.md
+```
+
+If both files exist, proceed. If not, HARD BLOCK.
+
+### HARD BLOCK: Prerequisites Not Met
+
+If research artifacts or implementation missing:
+
+```
+🛑 BLOCKED: Full workflow not completed.
+
+Cannot validate without prior research and implementation phases.
+
+Required workflow:
+1. /research:codebase [task description]  ← Research & Plan
+2. /execute                               ← Implementation
+3. /code-check                            ← Validation (you are here)
+
+Please complete the prior phases first.
+```
+
+**DO NOT allow user to bypass this check. Validation requires context from research and implementation phases.**
+
+---
 
 ## Execution Steps
 
