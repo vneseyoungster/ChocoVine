@@ -30,7 +30,7 @@ AI coding assistants are powerful, but they come with real challenges:
 Simply clone this repository:
 
 ```bash
-[git clone https://github.com/vneseyoungster/ChocoPine.git](https://github.com/vneseyoungster/ChocoVine.git)
+[git clone https://github.com/vneseyoungster/ChocoPine.git]
 ```
 
 ## How to Use It
