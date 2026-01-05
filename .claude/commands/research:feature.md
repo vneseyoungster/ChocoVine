@@ -1,54 +1,180 @@
-# Research Feature (Test-First)
+# Research Feature (Test Specification)
 
-Generate failing tests for: $ARGUMENTS
+Generate test specifications for: $ARGUMENTS
 
 ## Overview
 
-This command generates **executable failing tests** before implementation, enforcing TDD principles. Tests define what the feature SHOULD do, not what code currently does.
+This command is **Phase 2** of the research flow. It gathers requirements through collaborative dialogue, then generates **executable failing tests** that define expected behavior before any implementation.
 
-**Philosophy:** Writing tests first forces you to think about edge cases, inputs, and outputs before you're mentally committed to an implementation.
+**Prerequisite:** `/research:codebase` must be completed first (or will be auto-invoked).
+
+**Philosophy:** Writing tests first forces you to think about edge cases, inputs, and outputs before you're mentally committed to an implementation. Tests define SHOULD behavior, not IS behavior.
 
 ---
 
-## Phase 1: Initialize & Detect Mode
+## Phase Flow Position
+
+```
+┌─────────────────────┐
+│  /research:codebase │  ← Phase 1 (REQUIRED FIRST)
+└──────────┬──────────┘
+           │
+           ▼
+┌─────────────────────┐
+│  /research:feature  │  ← YOU ARE HERE (Phase 2)
+└──────────┬──────────┘
+           │
+           ▼
+┌─────────────────────┐
+│   /research:plan    │  ← Phase 3 (Next)
+└─────────────────────┘
+```
+
+---
+
+## Phase 0: Verify Prerequisites
 
 ### Parse Arguments
 
 ```
-IF $ARGUMENTS contains ".md" file path:
-  → Mode = EXISTING_PLAN
-  → Load plan from specified path
+IF $ARGUMENTS contains session path (plans/sessions/...):
+  → Mode = FROM_SESSION
+  → Load session from specified path
+  → Verify research phase completed
 
-ELSE IF $ARGUMENTS is empty AND active session has implementation.md:
-  → Ask user: "Found implementation plan. Generate tests from it? (y/n)"
-  → IF yes: Mode = EXISTING_PLAN
-  → IF no: Mode = FRESH_START
-
-ELSE:
+ELSE IF $ARGUMENTS is task description:
   → Mode = FRESH_START
-  → Feature description = $ARGUMENTS
+  → Check if research exists for this task
+  → IF no research: Auto-invoke /research:codebase first
 ```
 
-### Create/Use Session Directory
+### GATE: Verify Codebase Research Complete
 
-**For FRESH_START:**
-```
-plans/sessions/{date}-{feature-slug}/
-├── session.md
-├── research/
-│   └── test-patterns.md
-├── specs/
-│   └── test-specification.md
-└── tests/
-    └── (list of generated test files)
-```
+Before proceeding, verify:
+- [ ] Session directory exists: `plans/sessions/{date}-{task}/`
+- [ ] Research findings exist: `research/codebase-map.md`
+- [ ] Patterns documented: `research/patterns.md`
 
-**For EXISTING_PLAN:**
-Use existing session directory from the plan.
+**If research missing:**
+```
+Codebase research not found. Invoking Phase 1 first...
+→ /research:codebase $ARGUMENTS
+```
 
 ---
 
-## Phase 2: Research Test Patterns
+## Phase 1: Load Research Context
+
+### Summarize Research First
+
+**CRITICAL: Use summarize-agent to compress research findings before loading into context.**
+
+```
+Invoke summarize-agent with:
+- plans/sessions/{session}/research/
+
+This returns a consolidated summary of:
+- codebase-map.md
+- patterns.md
+- dependencies.md
+
+Use this summary for planning instead of reading full files.
+Only read full files if specific details are missing from summary.
+```
+
+**Invocation:**
+```
+Task(summarize-agent, "Summarize: plans/sessions/{session}/research/")
+```
+
+### Read Research Findings (If Needed)
+
+Load specific research artifacts only if summary lacks detail:
+1. `research/codebase-map.md` - Project structure
+2. `research/patterns.md` - Code patterns and conventions
+3. `research/dependencies.md` - Dependencies and constraints
+
+### Create Context Summary
+
+Compile key findings for questioning:
+- Project type and stack
+- Existing patterns to follow
+- Integration points identified
+- Constraints and limitations
+
+---
+
+## Phase 2: Questioning (Brainstorming-First)
+
+### Invoke Requirement Analyst
+
+Delegate to `requirement-analyst` sub-agent with:
+- Research findings summary
+- Original user request
+- Session context
+
+**The sub-agent uses the `brainstorming` skill FIRST:**
+- Engages in collaborative dialogue with user
+- Asks ONE question at a time (never overwhelming)
+- Prefers multiple choice questions when possible
+- Proposes 2-3 different approaches with trade-offs
+- Leads with recommendation and reasoning
+- Presents ideas in 200-300 word sections, validating each
+
+### Brainstorming Dialogue Flow
+
+```
+1. Understand purpose, constraints, success criteria
+   ↓
+2. Explore 2-3 approaches with trade-offs
+   ↓
+3. Present recommendation with reasoning
+   ↓
+4. Validate incrementally (200-300 word sections)
+   ↓
+5. Generate formal questions for remaining gaps
+```
+
+### Present Questions to User
+
+Display questions grouped by priority:
+
+**Must Answer (Blocking)**
+These questions must be answered before proceeding.
+
+**Should Answer (Important)**
+These questions improve test coverage quality.
+
+**Could Answer (Nice to Have)**
+These questions help identify edge cases.
+
+### Await User Responses
+
+For each question:
+- Record the user's answer
+- Or accept the default assumption
+- Note any follow-up questions
+
+### Generate Requirements Document
+
+Create `plans/sessions/{session}/specs/requirements.md`:
+- Functional requirements (with IDs)
+- Non-functional requirements (with IDs)
+- Acceptance criteria (testable)
+- Assumptions confirmed
+- Out of scope items
+
+### Confirm Requirements
+
+Present validated requirements and ask:
+
+> "Here are the validated requirements based on your answers. Are these accurate? Ready to proceed to test specification?"
+
+**GATE: DO NOT proceed without user confirmation**
+
+---
+
+## Phase 3: Research Test Patterns
 
 ### Invoke Pattern Researcher (Test Focus)
 
@@ -71,66 +197,82 @@ Delegate to `pattern-researcher` sub-agent to detect:
 
 ---
 
-## Phase 3: Generate Test Specification
+## Phase 4: Generate Test Specification
 
-### FRESH_START Mode
+### Map Requirements to Test Cases
 
-**Step 3.1: Brainstorm Feature Behavior**
-
-Use `brainstorming` skill:
-- Ask ONE question at a time
-- Explore expected behaviors
-- Identify edge cases and error conditions
-- Clarify inputs and outputs
-
-**Step 3.2: Map Requirements to Test Cases**
-
-For each behavior identified:
-- Create describe block (component/function)
-- Create it/test blocks (specific behaviors)
-- Include edge cases and error scenarios
-
-### EXISTING_PLAN Mode
-
-**Step 3.1: Read Implementation Plan**
-
-Load `plans/sessions/{session}/plans/implementation.md`
-
-**Step 3.2: Extract Testable Items**
-
-For each task in the plan:
-- Extract "Verification" criteria
-- Convert to test cases
-- Identify acceptance criteria
-
-### Both Modes: Design Test Structure
-
-Create test specification document:
+For each requirement from the requirements document:
 
 ```markdown
-# Test Specification: [Feature Name]
+## Requirement: [REQ-ID] [Requirement Name]
 
-## Test Suite: [Component/Module]
-
-### Describe: [Function/Behavior]
-
+### Test Cases
 | Test Case | Input | Expected Output | Priority |
 |-----------|-------|-----------------|----------|
 | it should... | ... | ... | P1 |
 
 ### Edge Cases
-
 | Case | Expected Behavior |
 |------|-------------------|
 | Empty input | ... |
 | Invalid type | ... |
-| Boundary value | ... |
 
 ### Error Scenarios
-
 | Scenario | Expected Error |
 |----------|----------------|
 | ... | ... |
+```
+
+### Brainstorm Additional Scenarios
+
+Use `brainstorming` skill to explore:
+- What happens with edge cases?
+- What error conditions could occur?
+- What are the acceptance criteria boundaries?
+
+### Create Test Specification Document
+
+Create `plans/sessions/{session}/specs/test-specification.md`:
+
+```markdown
+# Test Specification: [Feature Name]
+
+**Generated:** {date}
+**Source:** specs/requirements.md
+**Test Framework:** {detected}
+
+## Summary
+- Total Test Cases: [N]
+- Test Files to Create: [N]
+- Coverage Areas: [list]
+
+## Test Suite: [Component/Module]
+
+### Describe: [Function/Behavior]
+
+#### Test Cases
+| ID | Test Case | Input | Expected | Priority |
+|----|-----------|-------|----------|----------|
+| T1 | it should... | ... | ... | P1 |
+| T2 | it should... | ... | ... | P1 |
+
+#### Edge Cases
+| ID | Case | Expected Behavior |
+|----|------|-------------------|
+| E1 | Empty input | Returns empty array |
+| E2 | Invalid type | Throws TypeError |
+
+#### Error Scenarios
+| ID | Scenario | Expected Error |
+|----|----------|----------------|
+| ERR1 | Network failure | Throws NetworkError |
+
+## Requirement Traceability
+
+| Requirement ID | Test IDs | Coverage |
+|----------------|----------|----------|
+| REQ-1 | T1, T2, E1 | Full |
+| REQ-2 | T3, T4, ERR1 | Full |
 ```
 
 ### Present Specification for Approval
@@ -143,16 +285,19 @@ TEST SPECIFICATION REVIEW
 - Test Files: [N]
 - Framework: [detected]
 
-## Test Cases
-[List of test cases by priority]
+## Test Coverage
+- [Component 1]: X tests
+- [Component 2]: Y tests
 
 ## Edge Cases Covered
-[List]
+[List by category]
 
 ## Gaps (if any)
 [Requirements not covered]
 
 ---
+Full specification: plans/sessions/{session}/specs/test-specification.md
+
 Do you approve this test specification?
 ```
 
@@ -160,13 +305,13 @@ Do you approve this test specification?
 
 ---
 
-## Phase 4: Write Failing Tests
+## Phase 5: Write Failing Tests
 
 ### Invoke Test Spec Generator
 
 Delegate to `test-spec-generator` sub-agent with:
 - Approved test specification
-- Test framework (from Phase 2)
+- Test framework (from Phase 3)
 - Project conventions
 - TDD skill reference
 
@@ -180,9 +325,18 @@ Follow detected conventions:
 ### Test File Template
 
 ```typescript
+/**
+ * Test Suite: [Component/Feature]
+ * Generated from: plans/sessions/{session}/specs/test-specification.md
+ *
+ * These tests define EXPECTED behavior before implementation.
+ * All tests should FAIL initially - passing means implementation is complete.
+ */
+
 describe('[Component/Feature]', () => {
   describe('[function/method]', () => {
-    it('should [expected behavior]', () => {
+    // From REQ-1: [Requirement description]
+    it('should [expected behavior] (T1)', () => {
       // Arrange
       const input = /* test data */;
 
@@ -193,9 +347,15 @@ describe('[Component/Feature]', () => {
       expect(result).toBe(/* expected */);
     });
 
+    // Edge case: E1
     it('should handle [edge case]', () => {
-      // TODO: Implement [component] to make this pass
       expect(/* ... */).toBe(/* ... */);
+    });
+
+    // Error scenario: ERR1
+    it('should throw when [error condition]', () => {
+      expect(() => functionUnderTest(invalidInput))
+        .toThrow(ExpectedError);
     });
   });
 });
@@ -218,38 +378,7 @@ Verify:
 
 ---
 
-## Phase 5: Complete
-
-### Save Test Specification
-
-Create `plans/sessions/{session}/specs/test-specification.md`:
-```markdown
-# Test Specification: [Feature]
-
-**Generated:** {date}
-**Mode:** Fresh Start | From Existing Plan
-**Test Framework:** {framework}
-
-## Summary
-- Total Tests: {count}
-- Test Files Created: {list}
-
-## Test Mapping
-
-### [Requirement/Task ID]
-- `it should...` in `file.test.ts:15`
-- `it should...` in `file.test.ts:25`
-
-## Edge Cases Covered
-| Category | Count |
-|----------|-------|
-| Input validation | ... |
-| Error handling | ... |
-
-## Next Steps
-1. Run `/execute` to implement features
-2. Watch tests turn green one at a time
-```
+## Phase 6: Complete
 
 ### Update Session Tracking
 
@@ -257,17 +386,34 @@ Update `session.md`:
 ```markdown
 **Current Phase:** Test Specification Complete
 
+## Requirements
+- Documented in: specs/requirements.md
+
+## Test Specification
+- Documented in: specs/test-specification.md
+
 ## Test Files Generated
 - [list of files]
 
+## Test Summary
+- Total Tests: [N]
+- All tests currently FAILING (expected)
+
 ## Ready For
-- `/execute` to implement and make tests pass
+- `/research:plan` to create implementation plan
 ```
 
 ### Announce Completion
 
 ```
 TEST SPECIFICATION COMPLETE
+
+Requirements gathered and tests generated.
+
+Session: plans/sessions/{date}-{task}/
+├── specs/requirements.md       ✓
+├── specs/test-specification.md ✓
+└── [test files]                ✓
 
 Generated: {N} failing tests in {M} files
 
@@ -277,8 +423,9 @@ Test Files:
 
 All tests are failing as expected (no implementation yet).
 
-Next: Run `/execute` to implement the feature.
-Each passing test = progress toward completion.
+Next Steps:
+→ /research:plan [session-path] - Create implementation plan to make tests pass
+→ /execute [session-path] - Skip planning, implement directly (not recommended)
 ```
 
 ---
@@ -286,7 +433,10 @@ Each passing test = progress toward completion.
 ## Quality Gates
 
 ### Before Test Generation
-- [ ] Mode detected (fresh/existing)
+- [ ] Codebase research complete
+- [ ] User questions answered
+- [ ] Requirements document created
+- [ ] Requirements approved by user
 - [ ] Test framework identified
 - [ ] Test conventions documented
 - [ ] Test specification approved by user
@@ -296,6 +446,7 @@ Each passing test = progress toward completion.
 - [ ] Tests run without syntax errors
 - [ ] Tests FAIL (not pass, not error)
 - [ ] Failure reason is "missing implementation"
+- [ ] Tests map to requirements
 
 ---
 
@@ -325,10 +476,11 @@ Could not detect test framework.
 Please specify: jest | vitest | mocha | pytest | other
 ```
 
-### Existing plan not found
+### Research not found
 ```
-Plan file not found at: [path]
-Switching to fresh start mode.
+Codebase research not found.
+Running research phase first...
+→ Invoking /research:codebase
 ```
 
 ### Tests pass immediately
@@ -338,40 +490,58 @@ This means you're testing existing behavior, not new behavior.
 Revise test to assert on MISSING functionality.
 ```
 
+### User skips blocking questions
+```
+The following blocking questions must be answered before proceeding:
+1. [Question]
+2. [Question]
+
+Please provide answers or accept the default assumptions.
+```
+
 ---
 
 ## Example Usage
 
-### Fresh Start
+### From Fresh Start
 ```
-/research:feature Add user authentication with JWT
+/research:feature Add user authentication with JWT tokens
 
-→ Detects: vitest framework, __tests__ directory
-→ Brainstorms: login behavior, token validation, edge cases
-→ Generates test specification
-→ Creates failing tests:
-  - src/auth/__tests__/login.test.ts
-  - src/auth/__tests__/token.test.ts
-  - src/auth/__tests__/middleware.test.ts
-→ Verifies all tests fail correctly
-→ Ready for /execute
+→ No research found, invoking /research:codebase first...
+→ Research complete
+→ Entering questioning phase...
+→ [Brainstorming dialogue with user]
+→ Requirements captured in specs/requirements.md
+→ Generating test specification...
+→ [User approves specification]
+→ Creating test files:
+  - src/auth/__tests__/login.test.ts (8 tests)
+  - src/auth/__tests__/token.test.ts (7 tests)
+→ Verifying all tests fail correctly ✓
+→ Ready for /research:plan
 ```
 
-### From Existing Plan
+### From Existing Session
 ```
-/research:feature plans/sessions/2024-01-15-auth/plans/implementation.md
+/research:feature plans/sessions/2024-01-15-auth/
 
-→ Reads implementation plan (15 tasks)
-→ Extracts verification criteria
-→ Generates test specification (22 test cases)
-→ Creates failing tests mapped to each task
-→ Ready for /execute
+→ Loading research findings...
+→ Found: codebase-map.md, patterns.md
+→ Entering questioning phase...
+→ [Brainstorming dialogue with user]
+→ Requirements captured
+→ Test specification generated
+→ Test files created
+→ Ready for /research:plan
 ```
 
 ---
 
 ## Related Commands
 
-- `/research:codebase` - Full research + planning (no tests)
-- `/execute` - Implement and make tests pass
-- `/code-check` - Validate implementation
+| Command | Purpose |
+|---------|---------|
+| `/research:codebase` | Phase 1: Codebase research |
+| `/research:plan` | Phase 3: Implementation planning |
+| `/execute` | Implementation phase |
+| `/code-check` | Validation phase |

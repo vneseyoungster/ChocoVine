@@ -2,232 +2,226 @@
 
 Execute implementation plan for: $ARGUMENTS
 
-## Prerequisites Check
-- [ ] Research phase completed (`/research`)
-- [ ] Architecture approved
-- [ ] Implementation plan approved
-- [ ] Plan document in `plans/sessions/{session}/plans/`
+---
 
-## Execution Steps
+## Step 1: Load Implementation Plan
 
-1. **Load Implementation Plan**
-   Read: `plans/sessions/{session}/plans/implementation.md`
+### Locate Plan
 
-2. **Switch to Auto-Accept Mode**
-   Enter Shift+Tab to enable auto-accept
+```
+IF $ARGUMENTS contains plan path (plans/sessions/.../plans/implementation.md):
+  → Use specified plan path
 
-3. **Execute Tasks In Order**
-   For each task:
-   a. Invoke appropriate developer sub-agent
-   b. Implement per task specification
-   c. Run task verification
-   d. Log completion
+ELSE IF $ARGUMENTS contains session path (plans/sessions/...):
+  → Use: {session}/plans/implementation.md
 
-4. **Quality Checks Per Task**
-   After each task:
+ELSE:
+  → Find latest session: plans/sessions/*/plans/implementation.md
+  → Use most recent by date
+```
+
+### Summarize Plan
+
+**Use summarize-agent to reduce context usage:**
+
+```
+Task(summarize-agent, "
+  Summarize: {plan-path}
+
+  Focus on:
+  - Task list with dependencies
+  - File paths and operations
+  - Verification commands
+  - Session context path
+")
+```
+
+Extract from summary:
+- Ordered task list
+- Dependencies between tasks
+- Session path for context
+
+---
+
+## Step 2: For Each Task - Code Finding
+
+**DO NOT implement anything yet. Find code locations first.**
+
+### Invoke Full-Stack Developer
+
+For each task, invoke the code finder:
+
+```
+Task(full-stack-developer, "
+  Find code locations for task:
+
+  Session: {session-path}
+  Task: {task-description}
+
+  Research Context:
+  - Patterns: {session}/research/patterns.md
+  - Architecture: {session}/plans/architecture.md
+
+  Return:
+  - Files to modify with line numbers
+  - Patterns to follow
+  - Proposed changes (description only)
+  - Verification commands
+")
+```
+
+### Collect Findings Report
+
+The sub-agent returns:
+- `Files to Modify` - Exact file:line locations
+- `Patterns Found` - Existing code patterns to follow
+- `Proposed Changes` - Description of what needs to change
+- `Verification Commands` - How to test
+
+---
+
+## Step 3: Execute Implementation
+
+**Main agent implements based on findings.**
+
+### Implementation Steps
+
+For each item in Findings Report:
+
+1. **Read** the target file
+2. **Apply** changes using Edit tool
+3. **Follow** patterns identified by sub-agent
+4. **Verify** after each change:
    ```bash
    npm run typecheck
    npm run lint
    ```
 
-5. **Commit After Each Task**
-   Using commit message from plan:
-   ```bash
-   git add -A
-   git commit -m "[message from plan]"
-   ```
+### Commit After Logical Units
 
-6. **Track Progress**
-   Update session file with:
-   - Tasks completed
-   - Tasks remaining
-   - Any deviations
+After completing a related group of changes:
 
-7. **Transition to Validation**
-   After all tasks:
-   - Summarize changes made
-   - List files modified
-   - Prepare for validation phase
-
-## Sub-Agent Routing
-
-| Task Type | Sub-Agent |
-|-----------|-----------|
-| API/Backend | backend-developer |
-| UI/Frontend | frontend-developer |
-| Database | database-specialist |
-| Mixed | Route to primary concern |
-
-## Sub-Agent Invocation
-
-### Backend Tasks
-```
-Invoke backend-developer sub-agent with:
-- Task details from implementation plan
-- Reference to clean-code, api-design, error-handling skills
-- Verification commands to run
-```
-
-### Frontend Tasks
-```
-Invoke frontend-developer sub-agent with:
-- Task details from implementation plan
-- Reference to clean-code, component-design skills
-- Accessibility requirements
-- Verification commands to run
-```
-
-### Database Tasks
-```
-Invoke database-specialist sub-agent with:
-- Task details from implementation plan
-- Reference to clean-code, migration skills
-- Pre-migration checklist requirements
-- Verification commands to run
-```
-
-## Task Execution Protocol
-
-For each task in the implementation plan:
-
-### 1. Read Task Details
-- File operations (CREATE, MODIFY, DELETE)
-- Current state (if MODIFY)
-- Expected outcome
-- Dependencies on other tasks
-
-### 2. Check Patterns
-Before implementing, review:
-- `plans/sessions/{session}/research/patterns.md` for coding conventions
-- Similar implementations in codebase
-- Skill references for best practices
-
-### 3. Implement
-Follow the specified implementation notes:
-- Use patterns from research
-- Follow existing error handling approach
-- Match logging conventions
-
-### 4. Verify
-Run verification commands from task:
 ```bash
-# Example verification
-npm run typecheck
-npm run lint
-npm test -- [specific test file]
+git add {changed-files}
+git commit -m "{descriptive-message}"
 ```
 
-### 5. Self-Review
-Before marking complete:
-- [ ] Code follows project patterns
-- [ ] All types defined (if TypeScript)
-- [ ] Errors handled appropriately
-- [ ] No lint/type errors
-- [ ] Tests pass
+### If Implementation Issue
 
-### 6. Commit
-Use commit message from task:
-```bash
-git add [specific files]
-git commit -m "[commit message from plan]"
+```
+Encountered issue implementing: {task}
+Error: {error-details}
+
+Option
+1. Retry with different approach
+
 ```
 
-### 7. Update Progress
-Mark task as complete in session tracking
+---
 
-## Deviation Handling
+## Step 4: Repeat for All Tasks
 
-If plan cannot be followed exactly:
+```
+FOR each task in plan:
+  1. Invoke full-stack-developer (findings)
+  2. Execute implementation
+  3. Verify changes
+  4. Commit if successful
 
-### Minor Deviations
-(Different variable name, slight refactoring)
-1. Document deviation in task notes
-2. Explain rationale
-3. Continue with implementation
-
-### Significant Deviations
-(Different approach, additional files, scope change)
-1. STOP implementation
-2. Document the issue
-3. Present options to user
-4. Get approval before continuing
-5. Update plan document if approved
-
-### Blocking Issues
-(Missing dependency, conflicting code, unclear requirement)
-1. STOP implementation
-2. Document the blocker
-3. Identify what's needed to proceed
-4. Ask user for guidance
-5. Do NOT make assumptions
-
-## Progress Tracking
-
-Update `plans/sessions/{session}/session.md` after each task:
-
-```markdown
-## Implementation Progress
-
-### Completed Tasks
-- [x] Task 1.1: Create user model ✓
-- [x] Task 1.2: Add validation ✓
-
-### In Progress
-- [ ] Task 1.3: Create API endpoint
-
-### Remaining
-- [ ] Task 2.1: Add tests
-- [ ] Task 2.2: Update documentation
-
-### Deviations
-- Task 1.2: Used Zod instead of Joi (approved)
-
-### Issues
-- None currently
+UNTIL all tasks complete
 ```
 
-## Quality Gates
+### Handle Dependencies
 
-Before marking implementation complete:
-- [ ] All tasks executed
-- [ ] All verifications passed
-- [ ] All commits created
-- [ ] No outstanding deviations
-- [ ] Session file updated
+- Tasks with no dependencies: Can be batched
+- Tasks with dependencies: Wait for predecessors
+- Track completed tasks for dependency resolution
 
-## Gate: All tasks must complete before validation
+---
 
-Do NOT proceed to validation phase until:
-1. Every task in the plan is completed
-2. All verification commands pass
-3. All commits are created
-4. Progress tracking is updated
-5. User confirms implementation is complete
+## Step 5: Generate Review
 
-## Transition to Validation
+**After all tasks complete, invoke review-generator:**
 
-After all tasks complete:
+```
+Task(review-generator, "
+  Generate implementation review for:
 
-1. **Summarize Implementation**
-   ```markdown
-   ## Implementation Summary
-   - Tasks completed: X of Y
-   - Files created: [list]
-   - Files modified: [list]
-   - Commits: [list of commit hashes]
-   ```
+  Session: {session-path}
+  Plan: {plan-path}
 
-2. **Prepare for Validation**
-   - List all files that need review
-   - Identify test coverage needs
-   - Note any security-sensitive changes
+  Output to: {session}/reviews/implementation-review.md
+")
+```
 
-3. **Notify User**
-   "Implementation phase complete. Ready for validation?"
+The review-generator will:
+- Scan all changes made
+- Compare against original plan
+- Run verification commands
+- Generate structured review document
 
-4. **Await Confirmation**
-   Do NOT auto-transition to validation
+---
 
-## Next Phase
+## Step 6: Announce Completion
 
-After implementation complete: `/code-check`
+```
+IMPLEMENTATION COMPLETE
+
+Session: {session-path}
+Tasks: {completed}/{total}
+
+Review: plans/sessions/{session}/reviews/implementation-review.md
+
+Next: /code-check {session-path}
+```
+
+---
+
+## Workflow Summary
+
+```
+┌─────────────────────────────────────────────────┐
+│  1. LOAD PLAN (via summarize-agent)             │
+└──────────────────────┬──────────────────────────┘
+                       ▼
+┌─────────────────────────────────────────────────┐
+│  2. FIND CODE (via full-stack-developer)        │
+│     - Locate files and lines                    │
+│     - Document patterns                         │
+│     - Describe changes needed                   │
+└──────────────────────┬──────────────────────────┘
+                       ▼
+┌─────────────────────────────────────────────────┐
+│  3. EXECUTE (main agent)                        │
+│     - Apply changes using Edit tool             │
+│     - Follow identified patterns                │
+│     - Run verification                          │
+│     - Commit changes                            │
+└──────────────────────┬──────────────────────────┘
+                       ▼
+┌─────────────────────────────────────────────────┐
+│  4. REPEAT steps 2-3 for all tasks              │
+└──────────────────────┬──────────────────────────┘
+                       ▼
+┌─────────────────────────────────────────────────┐
+│  5. REVIEW (via review-generator)               │
+│     - Scan all changes                          │
+│     - Generate review document                  │
+└──────────────────────┬──────────────────────────┘
+                       ▼
+┌─────────────────────────────────────────────────┐
+│  6. COMPLETE                                    │
+│     → /code-check {session-path}                │
+└─────────────────────────────────────────────────┘
+```
+
+---
+
+## Related Commands
+
+| Command | Purpose |
+|---------|---------|
+| `/research:codebase` | Phase 1: Codebase research |
+| `/research:plan` | Phase 2: Architecture & planning |
+| `/research:feature` | Phase 3: Test specification |
+| `/code-check` | Validation phase |
