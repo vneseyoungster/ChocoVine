@@ -1,13 +1,15 @@
 
 # 🌲 ChocoVine
 
-[![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-[![Claude Code](https://img.shields.io/badge/Built%20for-Claude%20Code-purple)](https://claude.ai)
-[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-green.svg)](CONTRIBUTING.md)
 
 **AI coding that actually builds what you asked for.**
 
 ChocoVine is a workflow wrapper for **Claude Code** that stops AI from hallucinating. It forces the AI to write a plan and failing tests *before* writing any code. The result? Features that work on the first try, and a codebase that doesn't turn into spaghetti.
+
+![alt text](assets/logo.jpeg)
+[![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![Claude Code](https://img.shields.io/badge/Built%20for-Claude%20Code-purple)](https://claude.ai)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-green.svg)](CONTRIBUTING.md)
 
 ---
 
@@ -99,7 +101,7 @@ To get the best results, help ChocoVine understand your project. Edit `CLAUDE.md
 
 ## 📄 License
 
-MIT © [Your Name]
+MIT
 
 ---
 
