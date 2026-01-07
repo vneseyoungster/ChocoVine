@@ -4,17 +4,18 @@ Scan and document codebase: $ARGUMENTS
 
 ## Overview
 
-This command performs comprehensive codebase scanning and generates layered documentation to help developers get familiar quickly. It follows a 6-phase methodology: Understand, Structure, Essential Docs, Functions, Onboarding, and Maintain.
+This command performs comprehensive codebase scanning and generates layered documentation to help developers get familiar quickly. It uses parallel sub-agents for maximum efficiency.
 
 ---
 
 ## Phase 1: Initialize Scan Session
 
 ### Create Session Directory
+
 ```
 plans/sessions/{date}-project-scan/
 ├── session.md         # Scan tracking
-├── research/          # Analysis findings
+├── research/          # Analysis findings (populated by agents)
 │   ├── structure.md   # Directory structure
 │   ├── patterns.md    # Detected patterns
 │   ├── dependencies.md # Dependency analysis
@@ -23,6 +24,7 @@ plans/sessions/{date}-project-scan/
 ```
 
 ### Session File Template
+
 ```markdown
 # Session: Project Scan
 
@@ -53,175 +55,115 @@ plans/sessions/{date}-project-scan/
 
 ---
 
-## Phase 2: Understand Before Documenting
+## Phase 2: Parallel Research (Sub-Agent Delegation)
 
-### 2.1 Version Control Analysis
+**Launch all research agents in parallel using a single message with multiple Task calls:**
 
-Invoke analysis to extract:
-- Recent commit patterns and velocity
-- Key contributors and ownership
-- Branching strategy
-- Focus areas
+### Agent 1: Codebase Explorer
 
-**Commands:**
-```bash
-git log --oneline -50
-git log --all --oneline --graph | head -30
-git shortlog -sn | head -10
+```
+Task(codebase-explorer, "
+Explore and map the codebase structure:
+- Project type detection (frontend/backend/fullstack/library)
+- Framework identification
+- Directory organization and conventions
+- Key file locations (entry points, configs, tests)
+- Application entry points and initialization flow
+
+Output findings to: plans/sessions/{session}/research/structure.md
+", run_in_background=true)
 ```
 
-**Store findings:** `plans/sessions/{session}/research/history.md`
+### Agent 2: Pattern Researcher
 
-### 2.2 Structure Analysis
-
-Map the codebase:
-- Project type detection
-- Framework identification
-- Directory organization
-- Key file locations
-
-**Store findings:** `plans/sessions/{session}/research/structure.md`
-
-### 2.3 Configuration Analysis
-
-Identify all configuration:
-- Package manifests
-- Environment configs
-- Build/test configs
-- Linter/formatter configs
-
-### 2.4 Entry Point Analysis
-
-Find and trace:
-- Application entry points
-- API route registration
-- Middleware chains
-- Event handlers
-
-### 2.5 Pattern Detection
-
-Identify recurring patterns:
-- Naming conventions
+```
+Task(pattern-researcher, "
+Identify code patterns and conventions:
+- Naming conventions (files, functions, variables)
 - File organization strategy
 - Error handling patterns
-- State management
-- Testing patterns
+- State management approach
+- Testing patterns and structure
+- Common abstractions and utilities
 
-**Store findings:** `plans/sessions/{session}/research/patterns.md`
+Output findings to: plans/sessions/{session}/research/patterns.md
+", run_in_background=true)
+```
 
-### 2.6 Dependency Analysis
+### Agent 3: Dependency Researcher
 
-Catalog dependencies:
-- Direct dependencies
+```
+Task(dependency-researcher, "
+Analyze project dependencies:
+- Direct dependencies and their purposes
 - Dev dependencies
-- Dependency purposes
-- Version constraints
+- Version constraints and compatibility
+- Security vulnerabilities (if detectable)
+- Dependency graph overview
 
-**Store findings:** `plans/sessions/{session}/research/dependencies.md`
+Output findings to: plans/sessions/{session}/research/dependencies.md
+", run_in_background=true)
+```
 
----
+### Agent 4: Git History Analysis (Bash)
 
-## Phase 3: Generate Documentation
+Run directly (fast operation):
+```bash
+git log --oneline -50 > plans/sessions/{session}/research/history.md
+git log --all --oneline --graph | head -30 >> plans/sessions/{session}/research/history.md
+git shortlog -sn | head -10 >> plans/sessions/{session}/research/history.md
+```
 
-### Documentation Priority Order
+### Wait for Agents
 
-Generate in this order (most critical first):
-
-#### 3.1 README with Setup Instructions
-
-**Template:** `.claude/skills/documentation/project-documentation/templates/readme-template.md`
-
-**Output:** `docs/README.md`
-
-**Content:**
-- Project overview
-- Tech stack
-- Quick start
-- Key commands
-- Project structure
-
-**Gate:** User reviews README for accuracy
+```
+TaskOutput(agent1_id, block=true)
+TaskOutput(agent2_id, block=true)
+TaskOutput(agent3_id, block=true)
+```
 
 ---
 
-#### 3.2 Architecture Overview
+## Phase 3: Generate Documentation (Sub-Agent Delegation)
 
-**Template:** `.claude/skills/documentation/project-documentation/templates/architecture-template.md`
+**After research completes, invoke documentation-writer agent:**
 
-**Output:** `docs/architecture/overview.md`
+```
+Task(documentation-writer, "
+Generate comprehensive project documentation using research findings.
 
-**Content:**
-- System context
-- Component architecture
-- Data flow
-- Integration points
-- Design decisions
+Input files:
+- plans/sessions/{session}/research/structure.md
+- plans/sessions/{session}/research/patterns.md
+- plans/sessions/{session}/research/dependencies.md
+- plans/sessions/{session}/research/history.md
 
----
+Generate the following documentation in priority order:
 
-#### 3.3 Entry Points Walkthrough
+1. **README** → docs/README.md
+   - Project overview, tech stack, quick start, key commands, structure
 
-**Template:** `.claude/skills/documentation/project-documentation/templates/walkthrough-template.md`
+2. **Architecture Overview** → docs/architecture/overview.md
+   - System context, component architecture, data flow, design decisions
 
-**Output:** `docs/walkthroughs/entry-points.md`
+3. **Entry Points Walkthrough** → docs/walkthroughs/entry-points.md
+   - Where code execution starts, request flow, key handlers
 
-**Content:**
-- Where code execution starts
-- Request flow
-- Key handlers
-- Initialization sequence
+4. **Patterns Guide** → docs/walkthroughs/patterns.md
+   - Naming conventions, common patterns, code organization principles
 
----
+5. **API Reference** → docs/api/endpoints.md (if applicable)
+   - Endpoint documentation, function signatures, types, examples
 
-#### 3.4 Core Patterns Guide
+6. **Setup Guide** → docs/setup/installation.md
+   - Prerequisites, installation steps, configuration, troubleshooting
 
-**Output:** `docs/walkthroughs/patterns.md`
+7. **Gotchas** → docs/onboarding/gotchas.md
+   - Common pitfalls, non-obvious behaviors, tips for newcomers
 
-**Content:**
-- Naming conventions used
-- Common patterns identified
-- Code organization principles
-- Error handling approach
-
----
-
-#### 3.5 API Reference (if applicable)
-
-**Template:** `.claude/skills/documentation/project-documentation/templates/api-reference-template.md`
-
-**Output:** `docs/api/endpoints.md` or `docs/api/functions.md`
-
-**Content:**
-- Endpoint documentation
-- Function signatures
-- Types/interfaces
-- Examples
-
----
-
-#### 3.6 Setup Guide
-
-**Template:** `.claude/skills/documentation/project-documentation/templates/setup-guide-template.md`
-
-**Output:** `docs/setup/installation.md`
-
-**Content:**
-- Prerequisites
-- Installation steps
-- Configuration
-- Troubleshooting
-
----
-
-#### 3.7 Gotchas & Edge Cases
-
-**Output:** `docs/onboarding/gotchas.md`
-
-**Content:**
-- Common pitfalls
-- Non-obvious behaviors
-- Environment gotchas
-- Tips for newcomers
+Use templates from: .claude/skills/documentation/project-documentation/templates/
+")
+```
 
 ---
 
@@ -296,6 +238,22 @@ docs/
 
 ---
 
+## Sub-Agent Reference
+
+| Phase | Agent | Purpose |
+|-------|-------|---------|
+| 2 | `codebase-explorer` | Map structure, detect project type, find entry points |
+| 2 | `pattern-researcher` | Identify conventions, patterns, testing approach |
+| 2 | `dependency-researcher` | Catalog dependencies, versions, purposes |
+| 3 | `documentation-writer` | Generate all documentation from research findings |
+
+**Execution Strategy:**
+- Phase 2 agents run **in parallel** (background)
+- Phase 3 agent runs **after** Phase 2 completes
+- Total agents: 4 (3 parallel + 1 sequential)
+
+---
+
 ## Skill Reference
 
 **Primary Skill:** `project-documentation`
@@ -307,9 +265,6 @@ docs/
 - `templates/walkthrough-template.md`
 - `templates/api-reference-template.md`
 - `templates/setup-guide-template.md`
-
-**References:**
-- `references/function-documentation.md`
 
 ---
 
@@ -334,6 +289,12 @@ Standard entry points not detected.
 Please specify the main entry point for this project.
 ```
 
+### If agent fails
+```
+Agent {name} failed: {error}
+Retrying with reduced scope...
+```
+
 ---
 
 ## Example Usage
@@ -348,8 +309,8 @@ Please specify the main entry point for this project.
 
 ## Phase Indicators
 
-- 📖 Understanding (analyzing codebase)
-- 📝 Documenting (generating docs)
+- 📖 Understanding (research agents running)
+- 📝 Documenting (documentation agent running)
 - 🔍 Reviewing (quality check)
 - ✅ Complete (all docs generated)
 
@@ -360,6 +321,6 @@ Please specify the main entry point for this project.
 On completion:
 1. Update session status to COMPLETE
 2. List all generated documentation files
-3. Summarize key findings
+3. Summarize key findings from agent outputs
 4. Note areas needing manual documentation
 5. Provide next steps for documentation maintenance
