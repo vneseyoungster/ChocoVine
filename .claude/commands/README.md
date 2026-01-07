@@ -7,16 +7,19 @@ This directory contains custom slash commands for the development workflow.
 | Command | Purpose |
 |---------|---------|
 | `/initialize` | Initialize new codebase with guided setup |
-| `/start` | Execute full workflow (research → execute → validate) |
+| `/start` | Execute full 7-phase TDD workflow |
 | `/research` | Router to specialized research modes |
 | `/research:codebase` | Phase 1: Analyze codebase for patterns & structure |
-| `/research:feature` | Phase 2: Requirements & test specifications (TDD) |
-| `/research:plan` | Phase 3: Architecture & implementation planning |
+| `/research:feature` | Phase 2: Requirements gathering (brainstorming) |
+| `/research:spec` | Phase 3: Test specification from requirements |
+| `/generate:tests` | Phase 4: Generate failing test files (TDD) |
+| `/research:plan` | Phase 5: Architecture & implementation planning |
+| `/execute` | Phase 6: Execute implementation (make tests pass) |
+| `/code-check` | Phase 7: Run code review, tests, security audit |
 | `/research:ui` | Research UI designs from Figma links |
 | `/research:docs` | Research external documentation & libraries |
-| `/execute` | Execute implementation from approved plan |
-| `/code-check` | Run code review, tests, security audit |
-| `/quick-fix` | Quick fix for known problems (no planning phase) |
+| `/analyze` | Deep analysis of topics/concepts (standalone) |
+| `/quick-fix` | Quick fix for known problems (bypass workflow) |
 | `/project-scan` | Scan codebase and generate documentation |
 
 ## Usage
@@ -25,45 +28,82 @@ Slash commands are invoked by typing `/command-name` in Claude Code.
 
 ---
 
-## Research Flow
+## TDD-First Workflow (7 Phases)
 
-The research phase follows a sequential 3-phase flow for implementation tasks (TDD approach):
+The complete development workflow follows a TDD-first approach with 7 phases:
 
 ```
+┌─────────────────────────────────────────────────────────────────────┐
+│                         ENTRY POINTS                                 │
+├─────────────────────────────────────────────────────────────────────┤
+│  New Project? → /initialize                                          │
+│  Existing but undocumented? → /project-scan                          │
+│  Has Figma/Design URL? → /research:ui (then return to flow)          │
+│  Analyze concept? → /analyze (standalone)                            │
+└──────────────────────────────┬──────────────────────────────────────┘
+                               │
+                               ▼
 ┌─────────────────────┐
 │  /research:codebase │  ← Phase 1: Understand existing code & patterns
 └──────────┬──────────┘
            │
            ▼
 ┌─────────────────────┐
-│  /research:feature  │  ← Phase 2: Requirements & test specification (TDD)
+│  /research:feature  │  ← Phase 2: Requirements gathering (brainstorming)
 └──────────┬──────────┘
            │
            ▼
 ┌─────────────────────┐
-│   /research:plan    │  ← Phase 3: Architecture & implementation planning
+│   /research:spec    │  ← Phase 3: Test specification
+└──────────┬──────────┘
+           │
+           ▼
+┌─────────────────────┐
+│   /generate:tests   │  ← Phase 4: Generate failing test files (TDD)
+└──────────┬──────────┘
+           │
+           ▼
+┌─────────────────────┐
+│   /research:plan    │  ← Phase 5: Architecture & implementation planning
+└──────────┬──────────┘
+           │
+           ▼
+┌─────────────────────┐
+│      /execute       │  ← Phase 6: Implementation (make tests pass)
+└──────────┬──────────┘
+           │
+           ▼
+┌─────────────────────┐
+│    /code-check      │  ← Phase 7: Validation
 └─────────────────────┘
 ```
 
-**Standalone modes** (not part of sequential flow):
-- `/research:ui` - Figma design research
+**Standalone commands** (not part of sequential flow):
+- `/research:ui` - Figma design research (can feed into Phase 2)
 - `/research:docs` - External documentation research
+- `/analyze` - Topic/concept analysis
 
 ---
 
 ### `/start [feature description]`
 
-**Recommended for most tasks.** Executes the complete workflow automatically:
+**Recommended for most tasks.** Executes the complete TDD-first workflow automatically:
 
-1. **Research & Plan** - Analyzes codebase, asks questions, creates plan
-2. **Execute** - Implements tasks with appropriate developers
-3. **Validate** - Runs all quality checks
+1. **Phase 0: Entry Check** - Detects new/undocumented codebases
+2. **Phase 1: Codebase Research** - Analyzes existing code & patterns
+3. **Phase 2: Requirements** - Brainstorming dialogue to gather requirements
+4. **Phase 3: Test Spec** - Maps requirements to test cases
+5. **Phase 4: Generate Tests** - Creates failing test files (TDD)
+6. **Phase 5: Planning** - Architecture & implementation planning
+7. **Phase 6: Execute** - Implements tasks to make tests pass
+8. **Phase 7: Validate** - Code review, tests, security audit
 
 **User Interaction Points:**
-- After questions generated (answers needed)
-- After architecture created (approval needed)
-- After plan created (approval needed)
-- After validation (acknowledge results)
+- Phase 0: Confirm project state (if new/undocumented)
+- Phase 2: Answer questions & approve requirements
+- Phase 3: Approve test specification
+- Phase 5: Approve architecture & implementation plan
+- Phase 7: Acknowledge validation results
 
 **Example:**
 ```
@@ -483,31 +523,48 @@ docs/
 ### Full Workflow (Recommended)
 ```
 /start [description]
-  └── Handles everything automatically
+  └── Handles all 7 phases automatically with gates
 ```
 
 ### Manual Sequential Flow (TDD)
 ```
 /research:codebase [task]    → Phase 1: Understand code
        ↓
-/research:feature [session]  → Phase 2: Requirements & failing tests
+/research:feature [session]  → Phase 2: Requirements gathering
        ↓
-/research:plan [session]     → Phase 3: Plan to make tests pass
+/research:spec [session]     → Phase 3: Test specification
        ↓
-/execute [session]           → Implement (make tests pass)
+/generate:tests [session]    → Phase 4: Generate failing tests
+       ↓
+/research:plan [session]     → Phase 5: Architecture & planning
+       ↓
+/execute [session]           → Phase 6: Implement (make tests pass)
+       ↓
+/code-check [session]        → Phase 7: Validation
+```
+
+### Quick Path (Skip Full Planning)
+```
+/research:codebase [task]    → Phase 1: Understand code
+       ↓
+/research:feature [session]  → Phase 2: Requirements
+       ↓
+/research:spec [session]     → Phase 3: Test spec
+       ↓
+/generate:tests [session]    → Phase 4: Generate tests
+       ↓
+/execute [session]           → Implement directly (skip Phase 5)
        ↓
 /code-check [session]        → Validate
 ```
 
-### Quick Path (Skip Planning)
+### Entry Point Commands
 ```
-/research:codebase [task]    → Phase 1: Understand code
-       ↓
-/research:feature [session]  → Phase 2: Requirements & tests
-       ↓
-/execute [session]           → Implement directly
-       ↓
-/code-check [session]        → Validate
+New codebase?        → /initialize
+Existing codebase?   → /project-scan (for documentation)
+Figma design?        → /research:ui [url] (then continue flow)
+Analyze concept?     → /analyze [topic] (standalone)
+Quick bug fix?       → /quick-fix [problem] (bypass workflow)
 ```
 
 ---
