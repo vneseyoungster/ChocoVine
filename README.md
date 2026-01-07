@@ -1,65 +1,72 @@
 
+<div align="center">
+
+![ChocoVine Logo](assets/logo.jpeg)
+
 # ChocoVine
 
+**Stop prompting. Start building.**
 
-**AI coding that actually builds what you asked for.**
+A workflow wrapper for **Claude Code** that forces AI to think before it types.
+<br />
 
-ChocoVine is a workflow wrapper for **Claude Code** designed for **mid to large codebases**. It stops AI from hallucinating by forcing a structured approach: research first, plan second, tests third, code last. The result? Features that work on the first try, and a codebase that doesn't turn into spaghetti.
+[![License](https://img.shields.io/badge/license-MIT-blue.svg?style=flat-square)](LICENSE)
+[![Claude Code](https://img.shields.io/badge/Built%20for-Claude%20Code-purple?style=flat-square)](https://claude.ai)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-green.svg?style=flat-square)](CONTRIBUTING.md)
 
-![alt text](assets/logo.jpeg)
-[![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-[![Claude Code](https://img.shields.io/badge/Built%20for-Claude%20Code-purple)](https://claude.ai)
-[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-green.svg)](CONTRIBUTING.md)
+[Getting Started](#-getting-started) • [The Workflow](#-the-workflow) • [Commands](#-command-reference)
+
+</div>
 
 ---
 
-## Why ChocoVine?
+## ⚡️ The Problem
+We've all been there: You ask an AI to build a feature. It blindly writes 200 lines of code. You run it. It crashes. You spend the next hour prompt-battling to fix it.
 
-We've all been there: You ask an AI to build a feature. It writes 200 lines of code. You run it. It crashes. You spend the next hour prompt-battling to fix it.
+## 🌲 The Solution
+**ChocoVine turns "Vibes Coding" into Engineering.**
+It stops hallucinations by enforcing a strict **Research → Test → Code** loop.
 
-**ChocoVine fixes the "Black Box" problem:**
+*   🛡️ **TDD Guardrails:** The AI writes a failing test first. It *cannot* mark a task complete until that test passes.
+*   🧠 **Infinite Context:** Uses sub-agents to read your entire codebase without clogging up the chat memory.
+*   🔎 **You are the Architect:** You approve the Plan before a single line of code is written.
+*   📈 **Scales with You:** Optimized for mid-to-large codebases where "context limits" usually break other tools.
 
-*   **No more regression bugs:** We force a TDD (Test Driven Development) workflow. The AI writes the test first. It *cannot* say it's finished until the test passes.
-*   **Infinite Memory:** ChocoVine uses "Sub-agents" to handle research. This keeps your main chat context clean so Claude doesn't "forget" instructions halfway through.
-*   **You stay in control:** You approve the Plan before a single line of code is written.
-*   **Built for scale:** Optimized for mid to large codebases where context management matters most.
+---
 
-## Getting Started
+## 🚀 Getting Started
 
-You need [Claude Code](https://claude.ai/claude-code) installed. Then:
+You need [Claude Code](https://claude.ai/claude-code) installed.
+
+### 1. Installation
 
 ```bash
-# 1. Clone the repo
+# Clone the repo
 git clone https://github.com/vneseyoungster/Vibe-Starter-Pack.git
 
-# 2. Configure your project (tell ChocoVine about your stack)
-# Edit the CLAUDE.md file with your specific setup.
+# Configure your project stack (Edit CLAUDE.md)
+# Tell ChocoVine if you use React, Python, Docker, etc.
+nano CLAUDE.md
 ```
 
-### First Time Setup
+### 2. Initialization
 
-After cloning, run one of these commands to initialize ChocoVine for your codebase:
-
-| Command | When to Use |
-| :--- | :--- |
-| `/initialize [project-name]` | **New projects** - Sets up ChocoVine structure from scratch |
-| `/project-scan` | **Existing codebases** - Scans and documents your project, generates architecture docs |
+Tell ChocoVine to scan your project so it understands your architecture patterns.
 
 ```bash
-# For a new project:
-/initialize my-awesome-app
+# If you are starting a NEW project from scratch:
+/initialize my-new-app
 
-# For an existing codebase:
+# If you are adding ChocoVine to an EXISTING codebase:
 /project-scan
 ```
 
-This step helps ChocoVine understand your project structure, patterns, and conventions before you start building features.
-
 ---
 
-## How to Use
+## 🎮 How to Use
 
-### The Magic Command
+### The Magic Command (`/start`)
+
 For 95% of tasks, you only need one command. ChocoVine handles the research, testing, and coding automatically.
 
 ```bash
@@ -67,42 +74,17 @@ For 95% of tasks, you only need one command. ChocoVine handles the research, tes
 ```
 
 **What happens next?**
-1.  **Research:** Claude reads your existing code.
-2.  **Clarify:** It asks you questions (e.g., "Do you want to use Firebase or Auth0?").
-3.  **Plan:** It shows you a plan. You type `yes`.
-4.  **Test:** It creates a test file that fails (because the code doesn't exist yet).
-5.  **Code:** It writes the code to pass the test.
+1.  🕵️ **Research:** Claude reads your existing code (auth providers, database schema).
+2.  🗣️ **Clarify:** It asks you specific questions (e.g., "Do you want to use Firebase or Auth0?").
+3.  📝 **Plan:** It presents a plan. You type `yes`.
+4.  🧪 **Test:** It creates a test file that fails (because the code doesn't exist yet).
+5.  ✅ **Code:** It writes the code specifically to pass that test.
 
 ---
 
-### Other Useful Commands
+## 🧩 The Architecture
 
-While `/start` does it all, sometimes you need specific tools:
-
-| Command | Description | Use Case |
-| :--- | :--- | :--- |
-| `/quick-fix [error]` | Focused debugging | Fix a specific typo or NullPointer without running a full plan. |
-| `/project-scan` | Auto-Documentation | Generate READMEs, architecture docs, and API references by scanning your project. |
-| `/code-check [target]` | Code Review | Review, validate, or audit existing code for issues. |
-
-#### Research Commands
-
-For granular control over the research phase:
-
-| Command | Description | Use Case |
-| :--- | :--- | :--- |
-| `/research:codebase [topic]` | Understand existing code | "How does the auth system work?" |
-| `/research:feature [desc]` | Gather requirements | Start TDD flow with collaborative dialogue |
-| `/research:ui [figma-url]` | Figma to Code | Extract CSS, design tokens, and layout from Figma |
-| `/research:docs [topic]` | External documentation | Look up library docs, API references |
-| `/research:spec [path]` | Generate test spec | Create test specification from requirements |
-| `/research:plan [path]` | Architecture planning | Design implementation approach from spec |
-
----
-
-## The Workflow (Under the Hood)
-
-For the curious, here is how ChocoVine guarantees quality code. We strictly follow the **RSTPIV** loop:
+How do we guarantee code quality? We strictly follow the **RSTPIV** loop. This prevents the "spaghetti code" effect common with other AI tools.
 
 ```mermaid
 graph LR
@@ -111,62 +93,59 @@ graph LR
     C --> D[Plan]
     D --> E[Implement]
     E --> F[Validate]
+    
+    style C fill:#f96,stroke:#333,stroke-width:2px
+    style E fill:#9f6,stroke:#333,stroke-width:2px
 ```
 
-1.  **Research:** Sub-agents analyze the codebase structure.
-2.  **Specify:** Requirements are gathered and confirmed by you.
-3.  **Test:** **(The Secret Sauce)** Failing tests are generated based on specs.
-4.  **Plan:** Architecture is decided.
-5.  **Implement:** Code is written specifically to pass the tests.
-6.  **Validate:** Final security and logic checks.
-
 ---
 
-## Why Mid to Large Codebases?
+## 📚 Command Reference
 
-ChocoVine shines on codebases with:
-- **Multiple files/modules** where context matters
-- **Existing patterns** that new code should follow
-- **Test suites** that need to stay green
-- **Team conventions** that must be respected
+### Essentials
+| Command | Description |
+| :--- | :--- |
+| `/start [task]` | **The Main Event.** Runs the full TDD loop automatically. |
+| `/quick-fix [error]` | **Bug Hunter.** Fixes typos, null pointers, or small bugs without a full plan. |
+| `/project-scan` | **Documentarian.** Scans your project and generates/updates READMEs and Arch docs. |
 
-For small scripts or one-off files, you might not need the full workflow. But once your project grows beyond a few hundred lines, ChocoVine prevents the chaos.
-
----
-
-## Configuration (`CLAUDE.md`)
-
-To get the best results, help ChocoVine understand your project. Edit `CLAUDE.md` in your root directory:
-
-```markdown
-# CLAUDE.md
-- **Stack:** React, Tailwind, Node.js, PostgreSQL
-- **Build Command:** npm run build
-- **Test Command:** npm test
-- **Style Guide:** Airbnb standard, use arrow functions
-```
-
-## License
-
-MIT
-
----
-
-### Advanced Users (Manual Mode)
+### Research & Design
+| Command | Description |
+| :--- | :--- |
+| `/research:ui [figma-url]` | **Figma → Code.** Extracts tokens, CSS, and layout from a Figma URL. |
+| `/research:codebase` | **Context.** "How does the auth middleware work?" |
+| `/research:docs` | **External Knowledge.** Reads documentation for libraries you are using. |
 
 <details>
-<summary>Click to view granular TDD commands</summary>
-
-If you want step-by-step control over the agent loop, you can run phases individually:
+<summary><b>🛠 Advanced: Manual Phase Control</b> (Click to expand)</summary>
+<br />
+If you want granular control over the agent loop, you can run specific phases individually:
 
 | Phase | Command | Purpose |
 | :--- | :--- | :--- |
-| 1 | `/research:codebase` | Context gathering |
-| 2 | `/research:feature` | Requirements dialogue |
-| 3 | `/research:spec` | Test specification |
-| 4 | `/generate:tests` | Write failing tests |
-| 5 | `/research:plan` | Architecture design |
-| 6 | `/execute` | Implementation |
-| 7 | `/code-check` | Validation |
+| 1 | `/research:feature` | Collaborative requirements gathering |
+| 2 | `/research:spec` | Generate test specifications |
+| 3 | `/generate:tests` | Write the failing tests |
+| 4 | `/research:plan` | Create the implementation plan |
+| 5 | `/execute` | Write code to pass tests |
+| 6 | `/code-check` | Final validation & security audit |
 
 </details>
+
+---
+
+## ⚙️ Configuration
+
+To get the best results, your `CLAUDE.md` needs to be accurate. This is the "System Prompt" for your project.
+
+```markdown
+# CLAUDE.md Example
+- **Stack:** Next.js 14, Tailwind, Supabase, TypeScript
+- **Build Command:** npm run build
+- **Test Command:** npm test
+- **Conventions:** Use arrow functions, no 'any' types, prefer functional components.
+```
+
+## 📄 License
+
+MIT © 
