@@ -1,0 +1,43 @@
+{
+  "name": "chocovine",
+  "version": "1.0.0",
+  "description": "A workflow wrapper for Claude Code that forces AI to think before it types. Stop prompting. Start building.",
+  "keywords": [
+    "claude",
+    "claude-code",
+    "ai",
+    "workflow",
+    "tdd",
+    "code-generation",
+    "developer-tools",
+    "cli"
+  ],
+  "homepage": "https://github.com/vneseyoungster/ChocoVine#readme",
+  "bugs": {
+    "url": "https://github.com/vneseyoungster/ChocoVine/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/vneseyoungster/ChocoVine.git"
+  },
+  "license": "MIT",
+  "author": "vneseyoungster",
+  "type": "module",
+  "bin": {
+    "chocovine": "./bin/chocovine.js"
+  },
+  "files": [
+    "bin",
+    ".claude/agents",
+    ".claude/commands",
+    ".claude/hooks",
+    ".claude/skills",
+    ".claude/settings.local.json",
+    ".claude/.env-sample",
+    "CLAUDE.md",
+    "README.md"
+  ],
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

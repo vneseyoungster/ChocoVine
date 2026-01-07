@@ -48,6 +48,7 @@ plans/sessions/{date}-project-scan/
 - [ ] API reference (if applicable)
 - [ ] Setup guide
 - [ ] Gotchas documented
+- [ ] CLAUDE.md generated (project root)
 
 ## Findings Summary
 {to be filled during scan}
@@ -188,6 +189,7 @@ Use templates from: .claude/skills/documentation/project-documentation/templates
 5. ✅ API Reference - docs/api/endpoints.md
 6. ✅ Setup Guide - docs/setup/installation.md
 7. ✅ Gotchas - docs/onboarding/gotchas.md
+8. ✅ CLAUDE.md - ./CLAUDE.md (Claude context)
 
 ## Key Findings
 - {Finding 1}
@@ -209,7 +211,127 @@ Ask user:
 
 ---
 
-## Phase 5: Documentation Structure
+## Phase 5: Generate CLAUDE.md
+
+**Create a minimal CLAUDE.md file in the project root** with essential context for Claude to effectively edit the codebase.
+
+### CLAUDE.md Template
+
+Write the following to `./CLAUDE.md`:
+
+```markdown
+# Project Context
+
+## Project Overview
+- **Name:** {project name}
+- **Type:** {frontend/backend/fullstack/library/cli}
+- **Description:** {one-line description}
+
+## Tech Stack
+- **Language:** {primary language}
+- **Framework:** {main framework}
+- **Runtime:** {Node.js version / Python version / etc.}
+
+## Key Paths
+| Path | Purpose |
+|------|---------|
+| `{source}` | Source code |
+| `{tests}` | Test files |
+| `{config}` | Configuration |
+| `{entry}` | Main entry point |
+
+## Commands
+```bash
+# Development
+{dev command}
+
+# Build
+{build command}
+
+# Test
+{test command}
+
+# Lint
+{lint command}
+```
+
+## Architecture Notes
+{2-3 sentences about the architecture from research findings}
+
+## Conventions
+- {Key naming convention}
+- {Key pattern to follow}
+- {Important rule}
+
+## Important Files
+- `{file1}` - {purpose}
+- `{file2}` - {purpose}
+- `{file3}` - {purpose}
+```
+
+### Generation Rules
+
+1. **Keep it minimal** - Only include information Claude needs to start editing
+2. **Use actual values** - Pull from research findings, not placeholders
+3. **Prioritize actionable info** - Commands, paths, and conventions over descriptions
+4. **Skip empty sections** - If no tests exist, omit the test command
+5. **Validate paths** - Ensure all referenced paths actually exist
+
+### Example CLAUDE.md
+
+```markdown
+# Project Context
+
+## Project Overview
+- **Name:** acme-api
+- **Type:** backend
+- **Description:** REST API for Acme product catalog
+
+## Tech Stack
+- **Language:** TypeScript
+- **Framework:** Express.js
+- **Runtime:** Node.js 20
+
+## Key Paths
+| Path | Purpose |
+|------|---------|
+| `src/` | Source code |
+| `src/__tests__/` | Test files |
+| `src/config/` | Configuration |
+| `src/index.ts` | Main entry point |
+
+## Commands
+```bash
+# Development
+npm run dev
+
+# Build
+npm run build
+
+# Test
+npm test
+
+# Lint
+npm run lint
+```
+
+## Architecture Notes
+Clean architecture with controllers, services, and repositories. All business logic in services. Database access through repository pattern.
+
+## Conventions
+- camelCase for variables/functions, PascalCase for classes/types
+- One service per domain entity
+- All API responses wrapped in `{ data, error, meta }` format
+
+## Important Files
+- `src/index.ts` - Server bootstrap and middleware setup
+- `src/routes/index.ts` - API route definitions
+- `src/config/database.ts` - Database connection config
+```
+
+---
+
+## Phase 6: Documentation Structure
 
 Final documentation layout:
 ```
@@ -312,6 +434,7 @@ Retrying with reduced scope...
 - 📖 Understanding (research agents running)
 - 📝 Documenting (documentation agent running)
 - 🔍 Reviewing (quality check)
+- 🤖 Generating CLAUDE.md (creating Claude context file)
 - ✅ Complete (all docs generated)
 
 ---
@@ -321,6 +444,23 @@ Retrying with reduced scope...
 On completion:
 1. Update session status to COMPLETE
 2. List all generated documentation files
-3. Summarize key findings from agent outputs
-4. Note areas needing manual documentation
-5. Provide next steps for documentation maintenance
+3. **Generate CLAUDE.md in project root** with minimal context for Claude
+4. Summarize key findings from agent outputs
+5. Note areas needing manual documentation
+6. Provide next steps for documentation maintenance
+
+### Final Output Checklist
+
+```
+✅ Documentation Generated:
+   - docs/README.md
+   - docs/architecture/overview.md
+   - docs/walkthroughs/entry-points.md
+   - docs/walkthroughs/patterns.md
+   - docs/api/endpoints.md (if applicable)
+   - docs/setup/installation.md
+   - docs/onboarding/gotchas.md
+
+✅ Claude Context:
+   - ./CLAUDE.md (project root)
+```

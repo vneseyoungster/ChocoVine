@@ -1,0 +1,25 @@
+# Environment files with secrets
+.claude/.env
+.env
+.env.local
+.env.*.local
+
+# Node
+node_modules/
+npm-debug.log*
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Session data (user-specific)
+plans/sessions/
+
+# Generated docs (user-specific)
+docs/

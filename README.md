@@ -40,16 +40,44 @@ You need [Claude Code](https://claude.ai/claude-code) installed.
 
 ### 1. Installation
 
-```bash
-# Clone the repo
-git clone https://github.com/vneseyoungster/Vibe-Starter-Pack.git
+#### Option A: npx (Recommended)
 
-# Configure your project stack (Edit CLAUDE.md)
-# Tell ChocoVine if you use React, Python, Docker, etc.
+```bash
+# Navigate to your project
+cd your-project
+
+# Install ChocoVine
+npx chocovine init
+```
+
+#### Option B: Global Install
+
+```bash
+# Install globally
+npm install -g chocovine
+
+# Then in any project
+chocovine init
+```
+
+#### Option C: Clone the Repo
+
+```bash
+# Clone and copy manually
+git clone https://github.com/vneseyoungster/ChocoVine.git
+cp -r ChocoVine/.claude your-project/
+```
+
+### 2. Configuration
+
+Edit the generated `CLAUDE.md` with your project details:
+
+```bash
+# Tell ChocoVine your stack (React, Python, etc.)
 nano CLAUDE.md
 ```
 
-### 2. Initialization
+### 3. Initialization
 
 Tell ChocoVine to scan your project so it understands your architecture patterns.
 
