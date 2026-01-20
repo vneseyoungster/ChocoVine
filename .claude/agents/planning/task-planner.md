@@ -55,106 +55,59 @@ For each task:
 
 ## Output Format
 
-### Implementation Plan
-Save to: `plans/implementation-{session}.md`
+### Phase-Based Implementation
+
+**Core principle:** Independent phases first, dependent phases last.
+
+Create lightweight index + separate phase files:
+
+```
+plans/sessions/{session}/plans/
+├── implementation.md              # Index only (< 50 lines)
+├── phases/
+│   ├── phase-01-foundation.md     # Independent
+│   ├── phase-02-core-models.md    # Independent
+│   ├── phase-03-services.md       # Depends on models
+│   └── phase-04-integration.md    # Depends on all
+```
+
+### Implementation.md (Index)
 
 ```markdown
 # Implementation Plan: [Feature Name]
 
 **Session:** {session-id}
-**Created:** {date}
-**Architecture:** [link to architecture doc]
-**Status:** Proposed | Approved | In Progress | Completed
+**Status:** Proposed | In Progress | Completed
 
-## Summary
-- **Total Tasks:** [N]
-- **Phases:** [N]
-- **Risk Level:** High/Medium/Low
+## Phase Summary
 
-## Requirements Reference
-[Link to requirements doc]
+| Phase | Name | Status | Dependencies |
+|-------|------|--------|--------------|
+| 1 | Foundation | Pending | None |
+| 2 | Core Models | Pending | None |
+| 3 | Services | Pending | Phase 2 |
+| 4 | Integration | Pending | Phase 1-3 |
 
-## Current State
-[Brief description of existing state]
+## Execution Order
 
-## Expected Outcome
-[What success looks like]
+**Parallel (no dependencies):**
+- Phase 1, 2
 
----
+**Sequential:**
+- Phase 3 → after Phase 2
+- Phase 4 → after all phases
 
-## Phase 1: [Phase Name]
+## Phase Files
 
-### Task 1.1: [Task Name]
-**Priority:** P1 (Critical) | P2 (High) | P3 (Medium)
-**Size:** XS | S | M | L
-**Dependencies:** None | Task [X.Y]
-
-**Description:**
-[What needs to be done]
-
-**File Operations:**
-| Action | File | Details |
-|--------|------|---------|
-| CREATE | `src/services/auth.ts` | New service file |
-| MODIFY | `src/routes/index.ts` | Lines 45-60, add route |
-| DELETE | `src/old/legacy.ts` | Remove deprecated |
-
-**Current State:**
-```[language]
-// Location: [file:lines]
-[existing code snippet if modifying]
+- [Phase 1: Foundation](phases/phase-01-foundation.md)
+- [Phase 2: Core Models](phases/phase-02-core-models.md)
+- [Phase 3: Services](phases/phase-03-services.md)
+- [Phase 4: Integration](phases/phase-04-integration.md)
 ```
 
-**Expected State:**
-```[language]
-// After implementation
-[expected code snippet]
-```
+### Individual Phase Files
 
-**Implementation Notes:**
-- Follow pattern in `src/services/user.ts`
-- Use existing error handling from `src/utils/errors.ts`
-
-**Verification:**
-```bash
-npm run typecheck
-npm test -- auth.test.ts
-```
-
-**Commit Message:**
-```
-feat(auth): implement JWT token service
-
-- Add token generation and validation
-- Integrate with user service
-- Add unit tests
-```
-
----
-
-### Task 1.2: [Next Task]
-...
-
----
-
-## Phase 2: [Phase Name]
-
-### Task 2.1: [Task Name]
-...
-
----
-
-## Validation Checklist
-- [ ] All new files created
-- [ ] All modifications complete
-- [ ] Tests pass
-- [ ] Type check passes
-- [ ] Lint passes
-- [ ] Manual verification done
-
-## Rollback Plan
-[Steps to revert if needed]
-```
+Each phase file is self-contained. See `task-breakdown` skill templates.
 
 ## Task Size Guidelines
 
@@ -213,17 +166,27 @@ feat(auth): implement JWT token service
 
 ## Quality Checklist
 Before presenting plan:
+- [ ] Implementation.md is index-only (< 50 lines)
+- [ ] Each phase has separate file in `phases/`
+- [ ] Independent phases listed first
+- [ ] Dependent phases at bottom
+- [ ] Each phase is self-contained
 - [ ] All tasks are appropriately sized (no XL tasks)
 - [ ] File operations include exact paths
-- [ ] Current and expected state shown for modifications
 - [ ] Verification commands provided for each task
-- [ ] Commit messages follow conventions
 - [ ] Dependencies clearly marked
-- [ ] Phases organized logically
 
 ## Skills Usage
 
 ### task-breakdown
-Use to convert architecture into atomic, verifiable tasks.
+Use to convert architecture into independent, bite-sized phases.
 See: `.claude/skills/planning/task-breakdown/SKILL.md`
-Output: `plans/implementation-{session}.md`
+
+**Templates:**
+- `templates/phase-template.md` - Phase file format
+- `templates/task-template.md` - Task format within phases
+- `templates/dependency-sorter.md` - Ordering algorithm
+
+**Output:**
+- `plans/implementation.md` - Lightweight index
+- `plans/phases/phase-*.md` - Individual phase files

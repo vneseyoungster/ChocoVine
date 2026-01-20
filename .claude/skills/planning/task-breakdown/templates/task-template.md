@@ -1,93 +1,70 @@
 # Task Template
 
-Use this template for each task in an implementation plan.
+Use this template for tasks within phase files.
 
 ---
 
 ## Task [Phase.Number]: [Task Name]
 
-**Priority:** P1 (Critical) | P2 (High) | P3 (Medium) | P4 (Low)
+**Priority:** P1 | P2 | P3
 **Size:** XS | S | M | L
-**Dependencies:** None | Task [X.Y] (hard/soft)
+**Dependencies:** None | Task [X.Y]
 
 ---
 
 ### Description
 
-[Clear description of what needs to be done. Include the "why" if not obvious.]
+[What needs to be done - include "why" if not obvious]
 
 ---
 
 ### File Operations
 
-| Action | File Path | Details |
-|--------|-----------|---------|
-| CREATE | `[full/path/to/new/file]` | [Purpose, pattern to follow] |
-| MODIFY | `[full/path/to/file]` | Lines [X-Y], [what changes] |
-| DELETE | `[full/path/to/file]` | [Reason, dependency check] |
-| MOVE | `[from]` → `[to]` | [Update imports] |
+| Action | File | Details |
+|--------|------|---------|
+| CREATE | `path/to/file` | [Purpose, pattern to follow] |
+| MODIFY | `path/to/file` | Lines [X-Y], [change description] |
+| DELETE | `path/to/file` | [Reason, dependency check] |
+| MOVE | `from` → `to` | [Import updates needed] |
 
 ---
 
 ### Current State
-*(For MODIFY operations - show what exists now)*
+*(For MODIFY - show existing code)*
 
 ```[language]
-// File: [path/to/file]
-// Lines: [start-end]
-
-[existing code that will be changed]
+// File: path/to/file
+// Lines: X-Y
+[existing code]
 ```
 
 ---
 
 ### Expected State
-*(Show what the code should look like after implementation)*
 
 ```[language]
-// File: [path/to/file]
 // After implementation
-
-[expected code after changes]
+[expected code]
 ```
 
 ---
 
 ### Implementation Notes
 
-**Pattern Reference:**
-- Follow pattern in `[path/to/similar/implementation]`
-
-**Key Considerations:**
-- [Important detail 1]
-- [Important detail 2]
-
-**Gotchas to Avoid:**
-- [Common mistake to avoid]
-
-**Related Files:**
-- `[path/to/related/file]` - [why it's relevant]
+**Pattern:** Follow `path/to/similar/file`
+**Key points:**
+- [Important detail]
+- [Gotcha to avoid]
 
 ---
 
 ### Verification
 
 ```bash
-# Type check
-[type check command]
-
-# Lint
-[lint command]
-
-# Test
-[test command]
-
-# Build (if applicable)
-[build command]
+npm run typecheck
+npm run lint
+npm test -- [pattern]
 ```
-
-**Manual Verification:**
-- [ ] [Manual check if needed]
 
 ---
 
@@ -96,56 +73,65 @@ Use this template for each task in an implementation plan.
 ```
 [type]([scope]): [description]
 
-[body - what was done and why]
-
-[footer - closes issues, breaking changes]
+[body]
 ```
 
 ---
 
 ### Success Criteria
 
-- [ ] [Specific criterion 1]
-- [ ] [Specific criterion 2]
-- [ ] All verification commands pass
-- [ ] Code follows project patterns
+- [ ] [Specific criterion]
+- [ ] Verification passes
+- [ ] Follows project patterns
 
 ---
 
-## Example: Filled Template
+## Size Guidelines
 
-### Task 1.1: Create Authentication Service
+| Size | Scope | Example |
+|------|-------|---------|
+| **XS** | Single line | Typo, constant |
+| **S** | Single function | Add one function |
+| **M** | Single file | Multiple functions |
+| **L** | 2-4 files | Feature spanning files |
+| **XL** | Split required | Too large |
 
-**Priority:** P1 (Critical)
-**Size:** M
-**Dependencies:** None
+**Rule:** No XL tasks. Split them.
+
+---
+
+## Quick Example
+
+### Task 1.2: Add Auth Middleware
+
+**Priority:** P1
+**Size:** S
+**Dependencies:** Task 1.1
 
 ---
 
 ### Description
 
-Create a new authentication service that handles JWT token generation and validation. This is the foundation for the auth system and will be used by controllers and middleware.
+Create authentication middleware that validates JWT tokens on protected routes.
 
 ---
 
 ### File Operations
 
-| Action | File Path | Details |
-|--------|-----------|---------|
-| CREATE | `src/services/auth.service.ts` | New service, follow UserService pattern |
-| MODIFY | `src/services/index.ts` | Line 5, add export |
+| Action | File | Details |
+|--------|------|---------|
+| CREATE | `src/middleware/auth.ts` | New middleware |
+| MODIFY | `src/middleware/index.ts` | Line 5, add export |
 
 ---
 
 ### Current State
 
 ```typescript
-// File: src/services/index.ts
-// Lines: 1-6
-
-export { UserService } from './user.service';
-export { ProductService } from './product.service';
-export { OrderService } from './order.service';
+// File: src/middleware/index.ts
+// Lines: 1-4
+export { errorHandler } from './error';
+export { logger } from './logger';
 ```
 
 ---
@@ -153,104 +139,48 @@ export { OrderService } from './order.service';
 ### Expected State
 
 ```typescript
-// File: src/services/index.ts
 // After implementation
-
-export { UserService } from './user.service';
-export { ProductService } from './product.service';
-export { OrderService } from './order.service';
-export { AuthService } from './auth.service';
-```
-
-```typescript
-// File: src/services/auth.service.ts
-// New file
-
-import { Injectable } from '@nestjs/common';
-import { JwtService } from '@nestjs/jwt';
-import { User } from '../entities/user.entity';
-
-@Injectable()
-export class AuthService {
-  constructor(private jwtService: JwtService) {}
-
-  generateToken(user: User): string {
-    const payload = { sub: user.id, email: user.email };
-    return this.jwtService.sign(payload);
-  }
-
-  validateToken(token: string): TokenPayload | null {
-    try {
-      return this.jwtService.verify(token);
-    } catch {
-      return null;
-    }
-  }
-}
+export { errorHandler } from './error';
+export { logger } from './logger';
+export { authMiddleware } from './auth';
 ```
 
 ---
 
 ### Implementation Notes
 
-**Pattern Reference:**
-- Follow pattern in `src/services/user.service.ts`
-
-**Key Considerations:**
-- Use environment variables for JWT secret
-- Token expiry should be configurable
-- Include user ID and email in token payload
-
-**Gotchas to Avoid:**
-- Don't store sensitive data in token payload
-- Remember to handle token expiration gracefully
-
-**Related Files:**
-- `src/config/jwt.config.ts` - JWT configuration
-- `src/middleware/auth.middleware.ts` - Will use this service
+**Pattern:** Follow `src/middleware/logger.ts`
+**Key points:**
+- Use AuthService from Task 1.1
+- Return 401 for invalid tokens
+- Pass user to request context
 
 ---
 
 ### Verification
 
 ```bash
-# Type check
 npm run typecheck
-
-# Lint
-npm run lint -- src/services/auth.service.ts
-
-# Test
-npm test -- --testPathPattern=auth.service
-
-# Build
-npm run build
+npm test -- auth.middleware
 ```
-
-**Manual Verification:**
-- [ ] Service can be imported in other files
-- [ ] No circular dependencies
 
 ---
 
 ### Commit
 
 ```
-feat(auth): implement JWT authentication service
+feat(auth): add JWT authentication middleware
 
-- Add AuthService with token generation and validation
-- Configure JWT with environment-based secret
-- Export from services index
-
-Part of authentication system implementation
+- Validate tokens on protected routes
+- Attach user to request context
+- Return 401 for invalid/missing tokens
 ```
 
 ---
 
 ### Success Criteria
 
-- [ ] AuthService class is exported
-- [ ] generateToken returns valid JWT
-- [ ] validateToken correctly verifies tokens
-- [ ] All verification commands pass
-- [ ] Code follows project patterns
+- [ ] Middleware validates tokens
+- [ ] Invalid tokens return 401
+- [ ] Valid tokens pass user to route
+- [ ] Tests pass

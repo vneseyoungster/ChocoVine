@@ -46,21 +46,11 @@ You need [Claude Code](https://claude.ai/claude-code) installed.
 # Navigate to your project
 cd your-project
 
-# Install ChocoVine
-npx chocovine init
+# Install ChocoVine directly from GitHub
+npx github:vneseyoungster/ChocoVine init
 ```
 
-#### Option B: Global Install
-
-```bash
-# Install globally
-npm install -g chocovine
-
-# Then in any project
-chocovine init
-```
-
-#### Option C: Clone the Repo
+#### Option B: Clone the Repo
 
 ```bash
 # Clone and copy manually

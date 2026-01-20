@@ -6,6 +6,136 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ---
 
+## [1.1.0] - 2026-01-20
+
+### Full-Stack Developer Agent Optimization
+
+**Status:** Completed
+
+### Changed
+
+#### Compressed Agent Instructions (82% reduction)
+
+| Before | After |
+|--------|-------|
+| 376 lines | 77 lines |
+| 3-level output structure | Single file per task |
+| Verbose protocol steps | Concise 5-step protocol |
+| Separate template files per file | Combined changes document |
+
+#### Simplified Output Structure
+
+```
+Before:                          After:
+code-changes/                    code-changes/
+├── _index.md                    └── {task-slug}.md
+└── {task}/
+    ├── overview.md
+    └── files/*.md
+```
+
+#### Enhanced Protocol with Quality Gate
+
+```
+1. Analyze   → Understand task from implementation plan
+2. Search    → Find files/patterns with Glob/Grep
+3. Document  → Record file:line locations and changes
+4. Quality   → Apply skills (clean-code, api-design, etc.)
+5. Write     → Output to code-changes/{task}.md
+```
+
+### Added
+
+- Quality check step using skills before writing changes
+- Template file at `.claude/agents/implementation/templates/code-changes.md`
+
+### Benefits
+
+- **Lower token usage** - 82% smaller agent instructions
+- **Faster execution** - Less parsing overhead
+- **Simpler output** - One file per task instead of nested folders
+- **Quality gates** - Skills applied before finalizing changes
+
+---
+
+## [Update] - 2026-01-20
+
+### Task-Breakdown Skill Rewrite
+
+**Status:** Completed
+
+### Changed
+
+#### Phase-Based Implementation Approach
+
+The `task-breakdown` skill has been rewritten to support **independent, bite-sized phases** instead of one monolithic implementation plan.
+
+**Key Changes:**
+
+| Before | After |
+|--------|-------|
+| One massive `implementation.md` | Lightweight index + separate phase files |
+| All tasks in one document | Each phase in its own file |
+| No explicit ordering | Independent phases first, dependent last |
+| Implicit dependencies | Clear dependency matrix and sorting |
+
+#### New Output Structure
+
+```
+plans/sessions/{session}/plans/
+├── implementation.md              # Index only (< 50 lines)
+├── phases/
+│   ├── phase-01-foundation.md     # Independent - implement first
+│   ├── phase-02-core-models.md    # Independent - implement first
+│   ├── phase-03-services.md       # Depends on models
+│   └── phase-04-integration.md    # Depends on all (last)
+```
+
+#### The Iron Law
+
+```
+INDEPENDENT PHASES → TOP (implement first)
+DEPENDENT PHASES → BOTTOM (implement last)
+```
+
+### Added
+
+#### New Templates
+
+| File | Purpose |
+|------|---------|
+| `templates/phase-template.md` | Template for individual phase files |
+| `templates/dependency-sorter.md` | Algorithm for ordering phases by independence |
+
+### Modified
+
+#### Updated Files
+
+| File | Changes |
+|------|---------|
+| `.claude/skills/planning/task-breakdown/SKILL.md` | Complete rewrite with phase-based approach |
+| `.claude/skills/planning/task-breakdown/templates/task-template.md` | Streamlined for phase context |
+| `.claude/agents/planning/task-planner.md` | Updated to produce phase-based output |
+
+### Benefits
+
+- Phases can be implemented in parallel by multiple agents
+- Each phase is self-contained and independently verifiable
+- Phases can be rolled back without breaking other phases
+- Clear execution order based on dependencies
+
+### Summary
+
+| Category | Count |
+|----------|-------|
+| Skills Rewritten | 1 |
+| Templates Added | 2 |
+| Templates Updated | 1 |
+| Agents Updated | 1 |
+| **Total Files Changed** | **5** |
+
+---
+
 ## [Phase 1] - 2025-12-14
 
 ### Phase 1: Foundation & Research Infrastructure

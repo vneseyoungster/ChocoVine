@@ -53,44 +53,55 @@ For each task, invoke the code finder:
 
 ```
 Task(full-stack-developer, "
-  Find code locations for task:
-
   Session: {session-path}
   Task: {task-description}
 
-  Research Context:
+  Context:
   - Patterns: {session}/research/patterns.md
   - Architecture: {session}/plans/architecture.md
 
-  Return:
-  - Files to modify with line numbers
-  - Patterns to follow
-  - Proposed changes (description only)
-  - Verification commands
+  Output to: {session}/code-changes/{task-slug}.md
 ")
 ```
 
-### Collect Findings Report
+### Collect Findings
 
-The sub-agent returns:
-- `Files to Modify` - Exact file:line locations
-- `Patterns Found` - Existing code patterns to follow
-- `Proposed Changes` - Description of what needs to change
-- `Verification Commands` - How to test
+The sub-agent writes to `{session}/code-changes/{task-slug}.md`:
+
+```markdown
+# {task-name}
+
+## Purpose
+[Why this change - from implementation plan]
+
+## Changes
+
+### `{file-path}`
+**Summary:** [What this file does]
+
+| Lines | Action | Description |
+|-------|--------|-------------|
+| {n}-{m} | {Add|Modify|Remove} | {What to change} |
+
+**Pattern:** Follow `{similar-file}:{lines}`
+
+## Verification
+`{commands}`
+```
 
 ---
 
 ## Step 3: Execute Implementation
 
-**Main agent implements based on findings.**
+**Main agent implements based on code-changes documentation.**
 
 ### Implementation Steps
 
-For each item in Findings Report:
+For each file in `{session}/code-changes/{task-slug}.md`:
 
-1. **Read** the target file
-2. **Apply** changes using Edit tool
-3. **Follow** patterns identified by sub-agent
+1. **Read** the changes doc for file summary and locations
+2. **Read** the target source file at documented lines
+3. **Apply** changes using Edit tool, following referenced patterns
 4. **Verify** after each change:
    ```bash
    npm run typecheck
@@ -186,17 +197,14 @@ Next: /code-check {session-path}
                        ▼
 ┌─────────────────────────────────────────────────┐
 │  2. FIND CODE (via full-stack-developer)        │
-│     - Locate files and lines                    │
-│     - Document patterns                         │
-│     - Describe changes needed                   │
+│     → Write to: {session}/code-changes/{task}.md│
 └──────────────────────┬──────────────────────────┘
                        ▼
 ┌─────────────────────────────────────────────────┐
 │  3. EXECUTE (main agent)                        │
-│     - Apply changes using Edit tool             │
-│     - Follow identified patterns                │
-│     - Run verification                          │
-│     - Commit changes                            │
+│     - Read changes doc                          │
+│     - Apply changes, follow patterns            │
+│     - Verify and commit                         │
 └──────────────────────┬──────────────────────────┘
                        ▼
 ┌─────────────────────────────────────────────────┐
@@ -205,13 +213,10 @@ Next: /code-check {session-path}
                        ▼
 ┌─────────────────────────────────────────────────┐
 │  5. REVIEW (via review-generator)               │
-│     - Scan all changes                          │
-│     - Generate review document                  │
 └──────────────────────┬──────────────────────────┘
                        ▼
 ┌─────────────────────────────────────────────────┐
-│  6. COMPLETE                                    │
-│     → /code-check {session-path}                │
+│  6. COMPLETE → /code-check {session-path}       │
 └─────────────────────────────────────────────────┘
 ```
 
