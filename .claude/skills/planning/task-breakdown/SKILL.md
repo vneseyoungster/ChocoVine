@@ -1,223 +1,205 @@
 ---
 name: task-breakdown
-description: Break down high-level plans into specific tasks with file paths,
-  line numbers, and verification steps. Creates execution-ready implementation
-  plans.
+description: Use when converting architecture plans into implementation phases. Creates independent, bite-sized phase files that can be executed separately.
 ---
 
 # Task Breakdown Skill
 
-## Purpose
-Transform architecture plans into atomic, executable tasks with clear verification criteria.
+## Overview
+
+Transform architecture plans into **independent implementation phases**. Each phase is a separate file that can be executed without waiting for other phases.
+
+**Core principle:** Independent phases first, dependent phases last.
 
 ## When to Use
+
 - After architecture plan is approved
-- Converting design to implementation steps
-- Creating detailed work breakdown
-- Estimating implementation effort
+- Converting design to executable phases
+- Planning incremental implementation
+- Enabling parallel work streams
 
-## Task Template
-Use [templates/task-template.md](templates/task-template.md) for consistent task format.
+## Phase-Based Output Structure
 
-## Task Criteria
-
-### Atomic Tasks Must Be:
-1. **Single-concern**: One logical change per task
-2. **Verifiable**: Clear success criteria
-3. **Bounded**: Defined start and end
-4. **Estimated**: Size/complexity indicated
-5. **Ordered**: Dependencies explicit
-
-### Task Size Guidelines
-
-| Size | Description | Typical Scope |
-|------|-------------|---------------|
-| **XS** | Single line change | Typo fix, constant update, config tweak |
-| **S** | Single function | Add/modify one function, simple test |
-| **M** | Single file | Multiple functions in one file |
-| **L** | Multiple files, one concern | Feature spanning 2-4 files |
-| **XL** | Too large - split further | Break into smaller tasks |
-
-**Rule**: If a task is XL, it must be broken down further.
-
-## File Operation Types
-
-### CREATE
-Create new file from scratch.
-```markdown
-| Action | File | Details |
-|--------|------|---------|
-| CREATE | `src/services/auth.ts` | New auth service, follow UserService pattern |
+```
+plans/sessions/{session}/plans/
+├── implementation.md              # Master index (lightweight)
+├── phases/
+│   ├── phase-01-foundation.md     # Independent - implement first
+│   ├── phase-02-core-models.md    # Independent - implement first
+│   ├── phase-03-api-routes.md     # Independent - implement first
+│   ├── phase-04-ui-components.md  # Depends on models
+│   └── phase-05-integration.md    # Depends on all above
 ```
 
-Include:
-- Full file path
-- Template or pattern to follow
-- Key exports/functions to include
+## The Iron Law: Independence Ordering
 
-### MODIFY
-Change existing file.
-```markdown
-| Action | File | Details |
-|--------|------|---------|
-| MODIFY | `src/routes/index.ts` | Lines 45-60, add auth routes |
+```
+INDEPENDENT PHASES → TOP (implement first)
+DEPENDENT PHASES → BOTTOM (implement last)
 ```
 
-Include:
-- File path
-- Line range
-- Description of change
-- Before/after state
+**Why?** Independent phases can be:
+- Implemented in parallel by multiple agents
+- Verified without waiting for other phases
+- Rolled back without breaking other phases
 
-### DELETE
-Remove file or code.
+## Quick Reference: Phase Types
+
+| Type | Description | Position |
+|------|-------------|----------|
+| **Foundation** | Config, utils, types | Top (first) |
+| **Core** | Models, services | Top |
+| **Feature** | Specific functionality | Middle |
+| **Integration** | Connecting components | Bottom |
+| **Polish** | Tests, docs, cleanup | Bottom (last) |
+
+## Implementation.md Format
+
+The master file is **lightweight** - just an index:
+
 ```markdown
-| Action | File | Details |
-|--------|------|---------|
-| DELETE | `src/old/legacy-auth.ts` | Remove deprecated auth system |
+# Implementation Plan: [Feature]
+
+**Session:** {session-id}
+**Status:** Proposed | In Progress | Completed
+
+## Phase Summary
+
+| Phase | Name | Status | Dependencies |
+|-------|------|--------|--------------|
+| 1 | Foundation | Pending | None |
+| 2 | Core Models | Pending | None |
+| 3 | API Routes | Pending | None |
+| 4 | UI Components | Pending | Phase 2 |
+| 5 | Integration | Pending | Phase 1-4 |
+
+## Execution Order
+
+**Can implement in parallel:**
+- Phase 1, 2, 3 (no dependencies)
+
+**Must wait:**
+- Phase 4 → after Phase 2
+- Phase 5 → after all phases
+
+## Phase Files
+
+- [Phase 1: Foundation](phases/phase-01-foundation.md)
+- [Phase 2: Core Models](phases/phase-02-core-models.md)
+- [Phase 3: API Routes](phases/phase-03-api-routes.md)
+- [Phase 4: UI Components](phases/phase-04-ui-components.md)
+- [Phase 5: Integration](phases/phase-05-integration.md)
 ```
 
-Include:
-- File path
-- Reason for deletion
-- Confirmation of no dependencies
+## Individual Phase File Format
 
-### MOVE
-Relocate file.
+Each phase file is **self-contained**:
+
 ```markdown
-| Action | File | Details |
-|--------|------|---------|
-| MOVE | `src/auth.ts` → `src/services/auth.ts` | Reorganize to services directory |
+# Phase [N]: [Phase Name]
+
+**Dependencies:** None | Phase [X], [Y]
+**Can Start:** Immediately | After Phase [X]
+**Estimated Tasks:** [N]
+
+## Objective
+
+[One sentence: what this phase accomplishes independently]
+
+## Entry Criteria
+
+- [ ] [What must be true before starting]
+
+## Tasks
+
+### Task [N.1]: [Task Name]
+**Size:** XS | S | M | L
+**File:** `path/to/file.ts`
+
+[Task details using task-template.md format]
+
+---
+
+### Task [N.2]: [Task Name]
+...
+
+## Exit Criteria
+
+- [ ] All tasks complete
+- [ ] Verification passes
+- [ ] No impact on other phases
+
+## Verification
+
+```bash
+# Phase-specific verification
+[commands]
+```
 ```
 
-Include:
-- Source and destination paths
-- Import updates needed
-- Git history preservation note
+## Dependency Sorting Algorithm
 
-## Verification Approaches
+**Step 1:** List all components from architecture
+**Step 2:** For each component, identify what it imports/uses
+**Step 3:** Score by dependency count:
+- 0 dependencies = Phase 1 (top)
+- 1-2 dependencies = Phase 2-3 (middle)
+- 3+ dependencies = Last phases (bottom)
+
+**Step 4:** Within same dependency count, order by:
+1. Config/Types first (foundational)
+2. Services/Models second
+3. Controllers/UI third
+4. Integration/E2E last
+
+## Task Criteria (Unchanged)
+
+Tasks within phases must be:
+
+| Criterion | Description |
+|-----------|-------------|
+| **Single-concern** | One logical change |
+| **Verifiable** | Clear success criteria |
+| **Bounded** | Defined start/end |
+| **Sized** | XS, S, M, L (no XL) |
+
+**Rule:** XL tasks must be split further.
+
+## File Operations
+
+| Action | Format |
+|--------|--------|
+| CREATE | `path/to/new/file` + pattern to follow |
+| MODIFY | `path/to/file` + line range + before/after |
+| DELETE | `path/to/file` + reason + dependency check |
+| MOVE | `from` → `to` + import updates |
+
+## Verification Per Task
 
 | Type | Command | Use Case |
 |------|---------|----------|
-| Type Check | `npm run typecheck` | TypeScript changes |
-| Lint | `npm run lint` | Style/format compliance |
-| Unit Test | `npm test -- [pattern]` | Logic verification |
-| Integration Test | `npm run test:integration` | Component interaction |
-| E2E Test | `npm run e2e` | Full workflow |
-| Build | `npm run build` | Compilation verification |
-| Manual | [Specific instructions] | UI/UX, visual changes |
+| Type Check | `npm run typecheck` | TypeScript |
+| Lint | `npm run lint` | Style |
+| Unit Test | `npm test -- [pattern]` | Logic |
+| Build | `npm run build` | Compilation |
 
-### Framework-Specific Commands
+## Common Mistakes
 
-**Node.js/TypeScript:**
-```bash
-npm run typecheck
-npm run lint
-npm test -- --testPathPattern=auth
-```
+| Mistake | Fix |
+|---------|-----|
+| One massive implementation.md | Split into phase files |
+| Dependent phases at top | Reorder: independent first |
+| Phase depends on multiple others | Move to bottom |
+| XL tasks | Break into S/M tasks |
+| Vague verification | Specific commands |
 
-**Python:**
-```bash
-python -m pytest tests/test_auth.py
-python -m mypy src/auth.py
-python -m flake8 src/auth.py
-```
+## Output Checklist
 
-**Go:**
-```bash
-go test ./auth/...
-go vet ./auth/...
-golint ./auth/...
-```
-
-## Dependency Types
-
-### Hard Dependency
-Must complete before next task starts.
-```markdown
-**Dependencies:** Task 1.1 (hard) - Needs auth service to exist
-```
-
-### Soft Dependency
-Should complete first but can proceed if needed.
-```markdown
-**Dependencies:** Task 1.2 (soft) - Ideally after tests written
-```
-
-### None
-Independent task, can run in parallel.
-```markdown
-**Dependencies:** None
-```
-
-## Commit Message Conventions
-
-Follow conventional commits format:
-```
-<type>(<scope>): <description>
-
-[optional body]
-
-[optional footer]
-```
-
-### Types
-- `feat`: New feature
-- `fix`: Bug fix
-- `refactor`: Code change without feature/fix
-- `docs`: Documentation only
-- `test`: Adding tests
-- `chore`: Maintenance tasks
-
-### Examples
-```
-feat(auth): implement JWT token service
-
-- Add token generation with configurable expiry
-- Add token validation with signature verification
-- Integrate with user service for claims
-
-Closes #123
-```
-
-## Priority Levels
-
-| Priority | Meaning | When to Use |
-|----------|---------|-------------|
-| **P1** | Critical | Blocking other work, core functionality |
-| **P2** | High | Important, should be done soon |
-| **P3** | Medium | Standard priority |
-| **P4** | Low | Nice to have, can defer |
-
-## Phase Organization
-
-Group tasks into logical phases:
-1. **Foundation**: Core infrastructure, shared utilities
-2. **Core Features**: Main functionality
-3. **Integration**: Connecting components
-4. **Testing**: Test implementation
-5. **Documentation**: Docs and cleanup
-
-## Output Quality Checklist
-
-Before finalizing implementation plan:
-- [ ] All tasks are appropriately sized (no XL tasks)
-- [ ] File paths are complete and accurate
-- [ ] Line numbers included for modifications
-- [ ] Current and expected state shown for changes
-- [ ] Verification commands are runnable
-- [ ] Commit messages follow project conventions
-- [ ] Dependencies clearly marked
-- [ ] Phases organized logically
-- [ ] All architecture components covered
-- [ ] No orphan tasks (everything connects)
-
-## Output Location
-Save implementation plans to: `docs/plans/implementation-{session}.md`
-
-## Integration with Workflow
-
-1. **Architecture document** provides component design
-2. **Task breakdown** creates executable tasks (this skill)
-3. **Implementation** follows tasks exactly
-4. **Validation** verifies each task's success criteria
+Before presenting plan:
+- [ ] Implementation.md is index-only (< 50 lines)
+- [ ] Each phase has separate file
+- [ ] Independent phases listed first
+- [ ] Dependent phases at bottom
+- [ ] Each phase is self-contained
+- [ ] Tasks are appropriately sized
+- [ ] Verification commands provided

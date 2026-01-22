@@ -25,7 +25,7 @@ We've all been there: You ask an AI to build a feature. It blindly writes 200 li
 
 ## 🌲 The Solution
 **ChocoVine turns "Vibes Coding" into Engineering.**
-It stops hallucinations by enforcing a strict **Research → Test → Code** loop.
+It stops hallucinations by enforcing a strict **Plan → Test → Build** loop.
 
 *   🛡️ **TDD Guardrails:** The AI writes a failing test first. It *cannot* mark a task complete until that test passes.
 *   🧠 **Infinite Context:** Uses sub-agents to read your entire codebase without clogging up the chat memory.
@@ -46,21 +46,11 @@ You need [Claude Code](https://claude.ai/claude-code) installed.
 # Navigate to your project
 cd your-project
 
-# Install ChocoVine
-npx chocovine init
+# Install ChocoVine directly from GitHub
+npx github:vneseyoungster/ChocoVine init
 ```
 
-#### Option B: Global Install
-
-```bash
-# Install globally
-npm install -g chocovine
-
-# Then in any project
-chocovine init
-```
-
-#### Option C: Clone the Repo
+#### Option B: Clone the Repo
 
 ```bash
 # Clone and copy manually
@@ -82,11 +72,8 @@ nano CLAUDE.md
 Tell ChocoVine to scan your project so it understands your architecture patterns.
 
 ```bash
-# If you are starting a NEW project from scratch:
-/initialize my-new-app
-
-# If you are adding ChocoVine to an EXISTING codebase:
-/project-scan
+# /init auto-detects: new project wizard OR existing project scan
+/init
 ```
 
 ---
@@ -95,68 +82,87 @@ Tell ChocoVine to scan your project so it understands your architecture patterns
 
 ### The Magic Command (`/start`)
 
-For 95% of tasks, you only need one command. ChocoVine handles the research, testing, and coding automatically.
+For 95% of tasks, you only need one command. ChocoVine handles the planning, testing, and building automatically.
 
 ```bash
 /start Add a login page with Google OAuth
 ```
 
 **What happens next?**
-1.  🕵️ **Research:** Claude reads your existing code (auth providers, database schema).
+1.  🕵️ **Scan:** Claude maps your codebase structure and patterns.
 2.  🗣️ **Clarify:** It asks you specific questions (e.g., "Do you want to use Firebase or Auth0?").
-3.  📝 **Plan:** It presents a plan. You type `yes`.
-4.  🧪 **Test:** It creates a test file that fails (because the code doesn't exist yet).
-5.  ✅ **Code:** It writes the code specifically to pass that test.
+3.  📝 **Plan:** It presents architecture and tasks. You approve.
+4.  🧪 **Test:** It creates failing tests (because the code doesn't exist yet).
+5.  ✅ **Build:** It writes the code to pass those tests, validates, and reviews.
 
 ---
 
-## 🧩 The Architecture
+## 🧩 The Workflow
 
-How do we guarantee code quality? We strictly follow the **RSTPIV** loop. This prevents the "spaghetti code" effect common with other AI tools.
+How do we guarantee code quality? We strictly follow the **Plan → Test → Build** loop. This prevents the "spaghetti code" effect common with other AI tools.
 
 ```mermaid
 graph LR
-    A[Research] --> B[Specify]
-    B --> C[Test]
-    C --> D[Plan]
-    D --> E[Implement]
-    E --> F[Validate]
-    
-    style C fill:#f96,stroke:#333,stroke-width:2px
-    style E fill:#9f6,stroke:#333,stroke-width:2px
+    A[/init] --> B[/plan]
+    B --> C[/build]
+
+    subgraph Plan
+    B1[Scan] --> B2[Requirements]
+    B2 --> B3[Tests]
+    B3 --> B4[Architecture]
+    end
+
+    subgraph Build
+    C1[Implement] --> C2[Validate]
+    C2 --> C3[Review]
+    end
+
+    style B3 fill:#f96,stroke:#333,stroke-width:2px
+    style C1 fill:#9f6,stroke:#333,stroke-width:2px
 ```
 
 ---
 
 ## 📚 Command Reference
 
-### Essentials
+### Core Commands
 | Command | Description |
 | :--- | :--- |
-| `/start [task]` | **The Main Event.** Runs the full TDD loop automatically. |
-| `/quick-fix [error]` | **Bug Hunter.** Fixes typos, null pointers, or small bugs without a full plan. |
-| `/project-scan` | **Documentarian.** Scans your project and generates/updates READMEs and Arch docs. |
+| `/start [task]` | **The Main Event.** Runs `/plan` then `/build` automatically. |
+| `/plan [task]` | **The Planner.** Scan → Requirements → Tests → Architecture. |
+| `/build [session]` | **The Builder.** Implement → Validate → Review. |
+| `/fix [error]` | **Bug Hunter.** Systematic debugging or quick fixes. |
+| `/refactor [type]` | **Code Surgeon.** Dead code cleanup, rename/move, extract, or general refactoring. |
+| `/init` | **Setup.** New project wizard OR scan existing codebase. |
 
-### Research & Design
+### Research
 | Command | Description |
 | :--- | :--- |
-| `/research:ui [figma-url]` | **Figma → Code.** Extracts tokens, CSS, and layout from a Figma URL. |
-| `/research:codebase` | **Context.** "How does the auth middleware work?" |
-| `/research:docs` | **External Knowledge.** Reads documentation for libraries you are using. |
+| `/research [topic]` | **Auto-routes.** Detects Figma URLs, docs, or general topics. |
+| `/research --ui [figma-url]` | **Figma → Code.** Extracts tokens, CSS, and layout. |
+| `/research --docs [library]` | **External Knowledge.** Reads library documentation. |
+| `/research --analyze [topic]` | **Deep Dive.** Concept exploration and trade-off analysis. |
 
 <details>
-<summary><b>🛠 Advanced: Manual Phase Control</b> (Click to expand)</summary>
+<summary><b>🔄 Migration from v1.x</b> (Click to expand)</summary>
 <br />
-If you want granular control over the agent loop, you can run specific phases individually:
+Commands have been consolidated for simplicity:
 
-| Phase | Command | Purpose |
-| :--- | :--- | :--- |
-| 1 | `/research:feature` | Collaborative requirements gathering |
-| 2 | `/research:spec` | Generate test specifications |
-| 3 | `/generate:tests` | Write the failing tests |
-| 4 | `/research:plan` | Create the implementation plan |
-| 5 | `/execute` | Write code to pass tests |
-| 6 | `/code-check` | Final validation & security audit |
+| Old Command | New Equivalent |
+| :--- | :--- |
+| `/initialize` | `/init` |
+| `/project-scan` | `/init` (auto-detects existing project) |
+| `/research:codebase` | Part of `/plan` (Step 1: Scan) |
+| `/research:feature` | Part of `/plan` (Step 2: Requirements) |
+| `/research:spec` | Part of `/plan` (Step 3: Test Spec) |
+| `/generate:tests` | Part of `/plan` (Step 4: Generate Tests) |
+| `/research:plan` | Part of `/plan` (Step 5: Architecture) |
+| `/execute` | `/build` (Step 1-2: Implement) |
+| `/code-check` | `/build` (Step 3-4: Validate & Review) |
+| `/quick-fix` | `/fix` |
+| `/research:ui` | `/research --ui` |
+| `/research:docs` | `/research --docs` |
+| `/analyze` | `/research --analyze` |
 
 </details>
 

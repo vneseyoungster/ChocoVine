@@ -1,35 +1,93 @@
 # Hooks
 
-This directory contains event hooks for the RQPIV workflow system.
+This directory contains event hooks for Claude Code workflow automation.
 
-## Purpose
+## Overview
 
-Hooks are shell scripts that execute in response to specific events during the Claude Code workflow. They enable:
-
+Hooks are shell scripts that execute in response to specific Claude Code events. They enable:
 - Quality gate enforcement
 - Automated checks before/after actions
-- Custom workflow automation
+- Session persistence and memory
+- Code quality automation
 
-## Planned Hooks (Future Phases)
+## Active Hooks
 
-| Hook | Trigger | Purpose |
-|------|---------|---------|
-| `pre-phase-transition.sh` | Before phase change | Verify prerequisites are met |
-| `post-implementation.sh` | After code changes | Run linting, type checking |
-| `pre-commit.sh` | Before git commit | Enforce code quality |
+All hooks are configured in `../.claude/settings.json` using **inline scripts** for portability. The external scripts in this directory serve as reference implementations.
 
-## Hook File Format
+### Hook Events
 
-Hooks are executable shell scripts:
+| Event | Hooks | Description |
+|-------|-------|-------------|
+| **PreToolUse** | 5 hooks | Before tool execution |
+| **PostToolUse** | 4 hooks | After tool execution |
+| **PreCompact** | 1 hook | Before context compaction |
+| **SessionStart** | 1 hook | When session begins |
+| **Stop** | 3 hooks | When session ends |
 
-```bash
-#!/bin/bash
-# Hook: hook-name
-# Trigger: when this hook runs
-# Purpose: what this hook does
+### PreToolUse Hooks
 
-# Hook logic here
-exit 0  # 0 = success, non-zero = block action
+| Hook | Trigger | Action |
+|------|---------|--------|
+| Dev server blocker | `npm/pnpm/yarn/bun run dev` | Blocks unless in tmux |
+| Tmux reminder | Long-running commands | Suggests tmux usage |
+| Git push review | `git push` | Pauses for review |
+| Doc file blocker | `.md/.txt` file creation | Blocks random docs |
+| Strategic compact | Edit/Write tools | Suggests compaction |
+
+### PostToolUse Hooks
+
+| Hook | Trigger | Action |
+|------|---------|--------|
+| PR logger | `gh pr create` | Logs PR URL |
+| Prettier | JS/TS file edits | Auto-formats |
+| TypeScript check | TS file edits | Runs `tsc --noEmit` |
+| console.log warner | JS/TS file edits | Warns about debug logs |
+
+### Session Management Hooks
+
+| Hook | Event | Action |
+|------|-------|--------|
+| Pre-compact | PreCompact | Saves state before summarization |
+| Session start | SessionStart | Loads previous context |
+| Session end | Stop | Persists session state |
+| Continuous learning | Stop | Evaluates for patterns |
+
+## Directory Structure
+
+```
+hooks/
+├── README.md                    # This file
+├── memory-persistence/          # Session persistence hooks
+│   ├── pre-compact.sh          # State before compaction
+│   ├── session-start.sh        # Load previous context
+│   └── session-end.sh          # Save session state
+└── strategic-compact/           # Compaction management
+    └── suggest-compact.sh      # Suggest manual compaction
+```
+
+## Data Storage
+
+Hooks store data in user home directory:
+
+| Path | Purpose |
+|------|---------|
+| `~/.claude/sessions/` | Session files and compaction logs |
+| `~/.claude/skills/learned/` | Extracted patterns from sessions |
+
+## Configuration
+
+Hooks are configured in `.claude/settings.json`:
+
+```json
+{
+  "hooks": {
+    "PreToolUse": [...],
+    "PostToolUse": [...],
+    "PreCompact": [...],
+    "SessionStart": [...],
+    "Stop": [...]
+  }
+}
 ```
 
 ## Return Codes
@@ -39,17 +97,31 @@ exit 0  # 0 = success, non-zero = block action
 | 0 | Success - proceed with action |
 | 1+ | Failure - block action and show error |
 
-## Adding New Hooks
+## Customization
 
-1. Create a new `.sh` file with descriptive name
-2. Make it executable: `chmod +x hook-name.sh`
-3. Return appropriate exit code
-4. Document the hook in this README
+To modify hooks:
 
-## Configuration
+1. Edit `.claude/settings.json` for inline hooks
+2. Or modify scripts in this directory and update settings to reference them
 
-Hooks can be configured in Claude Code settings. See Claude Code documentation for details on:
+### Using External Scripts
 
-- Hook trigger events
-- Environment variables available
-- Timeout settings
+To use external scripts instead of inline:
+
+```json
+{
+  "hooks": [{
+    "type": "command",
+    "command": "~/.claude/hooks/memory-persistence/pre-compact.sh"
+  }]
+}
+```
+
+Note: External scripts must be in `~/.claude/` (user home) to be accessible.
+
+## Making Scripts Executable
+
+```bash
+chmod +x .claude/hooks/**/*.sh
+chmod +x .claude/skills/continuous-learning/*.sh
+```
