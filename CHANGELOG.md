@@ -1,8 +1,99 @@
 # Changelog
 
-All notable changes to the RQPIV Workflow System will be documented in this file.
+All notable changes to ChocoVine will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
+
+---
+
+## [3.0.0] - 2026-01-23
+
+### Breaking Changes - Command Namespace Update
+
+All slash commands now use the `cv:` prefix for namespace isolation and clarity.
+
+### Changed
+
+#### Command Renaming
+
+| Old Command | New Command |
+|-------------|-------------|
+| `/start` | Removed (use workflow below) |
+| `/init` | `/cv:init` |
+| `/plan` | `/cv:plan` |
+| `/build` | `/cv:build` |
+| `/fix` | `/cv:fix` |
+| `/refactor` | `/cv:refactor` |
+| `/research` | `/cv:research` |
+| (new) | `/cv:review` |
+
+#### Workflow Change
+
+The `/start` command has been removed. The recommended workflow is now explicit:
+
+```
+/cv:research {feature}  -> Gather context and requirements
+/cv:plan               -> Create architecture, tasks, test specs
+/cv:build              -> Implement the plan
+npm test               -> Run tests manually
+/cv:review             -> Validate changes
+```
+
+**Why the change?**
+- Namespace isolation: `cv:` prefix prevents conflicts with other tools
+- Explicit workflow: each command has one job with user approval gates
+- Better visibility: clear separation of concerns at each phase
+
+### Added
+
+#### CLAUDE.md Templates
+
+Added template files for `/cv:init` command:
+
+| File | Purpose |
+|------|---------|
+| `.claude/templates/CLAUDE.md.template` | Project-level context template |
+| `.claude/templates/user-CLAUDE.md.template` | User preferences template |
+
+Templates include placeholders for:
+- Tech stack configuration
+- File structure documentation
+- Code patterns (API, error handling, components)
+- Environment variables
+- Git workflow preferences
+- Entry points and dependencies
+
+#### Refactoring System
+
+The `/cv:refactor` command now supports multiple modes:
+
+| Mode | Description |
+|------|-------------|
+| `clean` / `dead code` | Dead code cleanup with severity categories |
+| `rename` / `move` | Symbol refactoring with reference tracking |
+| `extract` / `split` | Code extraction with dependency analysis |
+| (default) | General refactoring with pattern analysis |
+
+Safety features:
+- Test verification before and after each change
+- Automatic rollback on test failure
+- User approval gates for risky deletions
+- Atomic commits per logical unit
+
+#### Writing Skills
+
+Added `writing-skills` skill for creating, editing, and verifying skills before deployment.
+
+### Summary
+
+| Category | Change |
+|----------|--------|
+| Commands Renamed | 6 |
+| Commands Removed | 1 (`/start`) |
+| Commands Added | 1 (`/cv:review`) |
+| Templates Added | 2 |
+| Skills Added | 1 |
+| Agents Optimized | 1 (full-stack-developer) |
 
 ---
 
