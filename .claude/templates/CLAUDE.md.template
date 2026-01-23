@@ -1,0 +1,67 @@
+# {PROJECT_NAME}
+
+{PROJECT_DESCRIPTION}
+
+## Tech Stack
+
+- **Language:** {LANGUAGE}
+- **Framework:** {FRAMEWORK}
+- **Package Manager:** {PACKAGE_MANAGER}
+- **Testing:** {TESTING_FRAMEWORK}
+- **Linting:** {LINTING_TOOL}
+
+## File Structure
+
+```
+{FILE_STRUCTURE}
+```
+
+## Key Paths
+
+| Path | Purpose |
+|------|---------|
+{KEY_PATHS}
+
+## Available Commands
+
+```bash
+{AVAILABLE_COMMANDS}
+```
+
+## Code Patterns
+
+### API Response Format
+
+{API_PATTERN}
+
+### Error Handling
+
+{ERROR_HANDLING_PATTERN}
+
+### Component Structure
+
+{COMPONENT_PATTERN}
+
+## Environment Variables
+
+```bash
+{ENV_VARIABLES}
+```
+
+## Git Workflow
+
+- Branch: `{DEFAULT_BRANCH}`
+- Commit style: {COMMIT_STYLE}
+{GIT_NOTES}
+
+## Entry Points
+
+{ENTRY_POINTS}
+
+## Dependencies
+
+### Core
+{CORE_DEPENDENCIES}
+
+### Dev
+{DEV_DEPENDENCIES}
