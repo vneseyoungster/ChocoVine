@@ -6,27 +6,27 @@
 
 | Command | Purpose | Lines |
 |---------|---------|-------|
-| `/plan` | Plan feature: scan → requirements → tests → architecture | ~120 |
-| `/build` | Build from plan: implement → validate → review | ~100 |
-| `/research` | Research: auto-routes to UI/docs/analyze | ~80 |
-| `/fix` | Fix bugs: systematic-debugging or sequential-thinking | ~50 |
-| `/refactor` | Safe refactoring: dead code, rename, extract, general | ~150 |
-| `/init` | Initialize: new project wizard OR scan existing | ~100 |
-| `/start` | Full workflow: /plan → /build | ~30 |
+| `/cv:research` | Research: gather context, requirements, resolve conflicts | ~150 |
+| `/cv:plan` | Plan: architecture, tasks, test specs (from research) | ~100 |
+| `/cv:build` | Build: implement tasks, validate, generate manual test instructions | ~120 |
+| `/cv:review` | Review: code quality, security audit, coverage check | ~120 |
+| `/cv:fix` | Fix bugs: systematic-debugging or sequential-thinking | ~50 |
+| `/cv:refactor` | Safe refactoring: dead code, rename, extract, general | ~150 |
+| `/cv:init` | Initialize: new project wizard OR scan existing | ~100 |
 
 ---
 
 ## Quick Reference
 
 ```
-New project?        → /init
-Existing codebase?  → /init (scans and documents)
-New feature?        → /start {feature} OR /plan → /build
-Bug fix?            → /fix {problem}
-Research topic?     → /research {topic}
-Clean up code?      → /refactor clean
-Rename/move?        → /refactor rename {symbol}
-Extract module?     → /refactor extract {code}
+New project?        -> /cv:init
+Existing codebase?  -> /cv:init (scans and documents)
+New feature?        -> /cv:research -> /cv:plan -> /cv:build -> [test] -> /cv:review
+Bug fix?            -> /cv:fix {problem}
+Research topic?     -> /cv:research {topic}
+Clean up code?      -> /cv:refactor clean
+Rename/move?        -> /cv:refactor rename {symbol}
+Extract module?     -> /cv:refactor extract {code}
 ```
 
 ---
@@ -34,75 +34,111 @@ Extract module?     → /refactor extract {code}
 ## Workflow
 
 ```
-┌─────────┐     ┌───────┐     ┌─────────┐
-│  /init  │ ──▶ │ /plan │ ──▶ │ /build  │
-└─────────┘     └───────┘     └─────────┘
-                    │
-         ┌──────────┴──────────┐
-         ▼          ▼          ▼
-      Scan      Requirements  Architecture
-      Codebase  + Tests       + Tasks
+┌─────────────┐   ┌──────────┐   ┌────────────┐   ┌────────┐   ┌─────────────┐
+│/cv:research │-->│ /cv:plan │-->│ /cv:build  │-->│ [test] │-->│ /cv:review  │
+└─────────────┘   └──────────┘   └────────────┘   └────────┘   └─────────────┘
+      │                │               │               │               │
+      v                v               v               v               v
+   research/        plans/        code-changes/    (manual)       reviews/
+   - findings       - architecture  - task docs      npm test     - code-review
+   - patterns       - tasks         build-complete                - security
+   - requirements   - test-specs                                  - coverage
 ```
 
 ---
 
-## `/plan {feature}`
+## `/cv:research {topic}`
+
+**Purpose:** Gather context and requirements before planning
 
 **Phases:**
-1. **Scan** - Map codebase, find patterns
-2. **Requirements** - Adaptive Q&A until clear
-3. **Test Spec** - Generate failing tests
-4. **Architecture** - Design + task breakdown
+1. **Initialize** - Create session folder structure
+2. **Scan** - Parallel agents map codebase and patterns
+3. **Clarify** - Adaptive Q&A with user (one question at a time)
+4. **Resolve** - Handle pattern conflicts (block until resolved)
+5. **Consolidate** - Write requirements.md
 
-**Gates:** Requirements approval, Test spec approval, Architecture approval
+**Completeness Check:** Scope, success criteria, constraints, patterns, no conflicts
 
-**Output:** `plans/sessions/{date}-{slug}/`
+**Output:** `plans/sessions/{date}-{slug}/research/`
+
+**Modes:** `--resume`, `--ui {figma-url}`, `--docs {library}`
 
 ---
 
-## `/build {session-path}`
+## `/cv:plan {session-path}`
+
+**Purpose:** Create implementation plan from research
 
 **Phases:**
-1. **Read** - Load plan, find code locations
-2. **Implement** - Execute tasks, run mapped tests
-3. **Validate** - Full test suite, typecheck, lint
-4. **Review** - Code review, security audit
+1. **Load** - Read research/requirements.md and patterns.md
+2. **Detect** - Determine plan type (feature, fix, refactor, test-spec)
+3. **Architecture** - solution-architect designs structure (GATE 1)
+4. **Tasks** - task-planner breaks down into atomic tasks (GATE 2)
+5. **Test Specs** - test-spec-generator creates test cases (GATE 3)
 
-**Output:** Implemented code, passing tests, review reports
+**Gates:** Each phase requires user approval before proceeding
+
+**Output:** `{session}/plans/` (architecture.md, tasks.md, test-specs.md)
+
+---
+
+## `/cv:build {session-path}`
+
+**Purpose:** Implement the plan
+
+**Phases:**
+1. **Load** - Read plans/tasks.md
+2. **Execute** - For each task: find code, implement, inline validate (lint/typecheck)
+3. **Validate** - Full build check (no auto-test)
+4. **Summary** - Generate build-complete.md with manual test instructions
+
+**Inline Validation:** Lint + typecheck after each file change
+
+**Output:** `{session}/build-complete.md`, `{session}/code-changes/`
 
 **Mode:** `--no-plan` for direct implementation
 
 ---
 
-## `/research {topic}`
+## `/cv:review {session-path}`
 
-**Auto-detects type:**
-- Figma URL → UI research (exports, analyzes with Gemini)
-- Library/framework → Documentation research
-- Other → Topic analysis
+**Purpose:** Validate changes before merge
 
-**Force mode:** `--ui`, `--docs`, `--analyze`
+**Phases:**
+1. **Load** - Find session with build-complete.md
+2. **Validate** - Parallel agents: code-reviewer, security-auditor, test-automator
+3. **Consolidate** - Most-severe-wins recommendation logic
+
+**Coverage Gate:** 80% minimum (hard gate)
+
+**Recommendation Levels:**
+- APPROVE: Ready to merge
+- APPROVE WITH CHANGES: Minor issues
+- REQUEST CHANGES: Significant issues or coverage < 80%
+
+**Output:** `{session}/reviews/` (code-review.md, security-audit.md, coverage-report.md, review.md)
 
 ---
 
-## `/fix {problem}`
+## `/cv:fix {problem}`
 
 **Routes to:**
-- Bug/error → systematic-debugging skill
-- Complex reasoning → sequential-thinking skill
-- Simple → Direct fix
+- Bug/error -> systematic-debugging skill
+- Complex reasoning -> sequential-thinking skill
+- Simple -> Direct fix
 
 **Auto-commits** if tests pass.
 
 ---
 
-## `/refactor {type}`
+## `/cv:refactor {type}`
 
 **Auto-detects type:**
-- `clean` / `dead code` → Dead code cleanup with severity categories
-- `rename` / `move` → Symbol refactoring with reference tracking
-- `extract` / `split` → Code extraction with dependency analysis
-- Other → General refactoring with pattern analysis
+- `clean` / `dead code` -> Dead code cleanup with severity categories
+- `rename` / `move` -> Symbol refactoring with reference tracking
+- `extract` / `split` -> Code extraction with dependency analysis
+- Other -> General refactoring with pattern analysis
 
 **Safety features:**
 - Test verification before and after each change
@@ -114,7 +150,7 @@ Extract module?     → /refactor extract {code}
 
 ---
 
-## `/init`
+## `/cv:init`
 
 **New project:** Interactive wizard
 - Project type, tech stack, preferences
@@ -126,32 +162,48 @@ Extract module?     → /refactor extract {code}
 
 ---
 
-## `/start {feature}`
+## Migration from /start
 
-**Thin wrapper:**
-1. Entry check (suggests /init if needed)
-2. Runs /plan
-3. Runs /build
-4. Shows summary
+The `/start` command has been removed. Use this workflow instead:
 
-**Resume:** `/start --resume {session-path}`
+```
+OLD: /start {feature}
+
+NEW:
+1. /cv:research {feature}  - Gather context and requirements
+2. /cv:plan                - Create architecture, tasks, test specs
+3. /cv:build               - Implement the plan
+4. npm test                - Run tests manually
+5. /cv:review              - Validate changes
+```
+
+**Why the change?**
+- Separation of concerns: each command has one job
+- User control: approve each phase before proceeding
+- Flexibility: resume at any phase, skip phases if needed
+- Visibility: clear artifacts at each stage
 
 ---
 
-## Migration from Old Commands
+## Session Folder Structure
 
-| Old | New |
-|-----|-----|
-| `/research:codebase` | `/plan` (Step 2) |
-| `/research:feature` | `/plan` (Step 3) |
-| `/research:spec` | `/plan` (Step 4) |
-| `/research:plan` | `/plan` (Step 6) |
-| `/generate:tests` | `/plan` (Step 5) |
-| `/execute` | `/build` (Step 2) |
-| `/code-check` | `/build` (Step 3-4) |
-| `/research:ui` | `/research --ui` |
-| `/research:docs` | `/research --docs` |
-| `/analyze` | `/research --analyze` |
-| `/quick-fix` | `/fix` |
-| `/initialize` | `/init` |
-| `/project-scan` | `/init` |
+```
+plans/sessions/{date}-{slug}/
+├── session.md              # Progress tracking
+├── research/
+│   ├── codebase-findings.md
+│   ├── patterns.md
+│   └── requirements.md
+├── plans/
+│   ├── architecture.md
+│   ├── tasks.md
+│   └── test-specs.md
+├── code-changes/
+│   └── {task-slug}.md
+├── reviews/
+│   ├── code-review.md
+│   ├── security-audit.md
+│   ├── coverage-report.md
+│   └── review.md
+└── build-complete.md
+```
