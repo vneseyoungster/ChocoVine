@@ -83,7 +83,7 @@ git add -A && git commit -m "fix: {description}"
 
 ```
 IF fix touches 3+ files:
-  → Warning: "This may need more planning. Continue or switch to /plan?"
+  → Warning: "This may need more planning. Continue or switch to /cv:plan?"
   → User decides
 ```
 

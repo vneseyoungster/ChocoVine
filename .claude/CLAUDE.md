@@ -56,13 +56,13 @@ Located in `.claude/agents/`:
 
 | Command | Purpose |
 |---------|---------|
-| `/start` | Full workflow: /plan then /build |
-| `/plan` | Scan, requirements, tests, architecture |
-| `/build` | Implement, validate, review |
-| `/research` | Auto-routes to UI/docs/analyze |
-| `/fix` | Bug fix with systematic-debugging |
-| `/refactor` | Safe refactoring: clean, rename, extract |
-| `/init` | New project wizard or scan existing |
+| `/cv:research` | Gather context, requirements, resolve conflicts |
+| `/cv:plan` | Architecture, tasks, test specs (from research) |
+| `/cv:build` | Implement, validate, generate test instructions |
+| `/cv:review` | Code review, security audit, coverage check |
+| `/cv:fix` | Bug fix with systematic-debugging |
+| `/cv:refactor` | Safe refactoring: clean, rename, extract |
+| `/cv:init` | New project wizard or scan existing |
 
 ---
 
@@ -89,17 +89,17 @@ Located in `.claude/agents/`:
 ## Workflow
 
 ```
-┌─────────┐     ┌───────┐     ┌─────────┐
-│  /init  │ ──▶ │ /plan │ ──▶ │ /build  │
-└─────────┘     └───────┘     └─────────┘
+┌─────────────┐   ┌──────────┐   ┌────────────┐   ┌────────┐   ┌─────────────┐
+│/cv:research │-->│ /cv:plan │-->│ /cv:build  │-->│ [test] │-->│ /cv:review  │
+└─────────────┘   └──────────┘   └────────────┘   └────────┘   └─────────────┘
 ```
 
 Quick reference:
-- New project? → `/init`
-- New feature? → `/start {feature}` or `/plan` then `/build`
-- Bug fix? → `/fix {problem}`
-- Research? → `/research {topic}`
-- Clean up code? → `/refactor clean`
+- New project? -> `/cv:init`
+- New feature? -> `/cv:research` -> `/cv:plan` -> `/cv:build` -> test -> `/cv:review`
+- Bug fix? -> `/cv:fix {problem}`
+- Research? -> `/cv:research {topic}`
+- Clean up code? -> `/cv:refactor clean`
 
 ---
 
@@ -107,10 +107,12 @@ Quick reference:
 
 | Document | Location |
 |----------|----------|
-| Session Plans | `plans/sessions/{date}-{slug}/` |
-| Architecture | `plans/architecture-{session}.md` |
-| Reviews | `docs/reviews/` |
-| Research | `docs/research/` |
+| Session Root | `plans/sessions/{date}-{slug}/` |
+| Research | `{session}/research/` |
+| Plans | `{session}/plans/` |
+| Code Changes | `{session}/code-changes/` |
+| Reviews | `{session}/reviews/` |
+| Build Summary | `{session}/build-complete.md` |
 
 ---
 

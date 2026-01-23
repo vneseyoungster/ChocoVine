@@ -1,0 +1,46 @@
+# User Preferences
+
+Personal coding preferences applied across all projects.
+
+---
+
+## Code Style
+
+- No emojis in code, comments, or documentation
+- Prefer immutability - never mutate objects or arrays
+- Many small files over few large files
+- 200-400 lines typical, 800 max per file
+
+## Git
+
+- Conventional commits: `feat:`, `fix:`, `refactor:`, `docs:`, `test:`
+- Always test locally before committing
+- Small, focused commits
+
+## Testing
+
+- TDD: Write tests first
+- 80% minimum coverage
+- Unit + integration + E2E for critical flows
+
+## Editor
+
+- Primary editor: {EDITOR}
+- Vim mode: {VIM_MODE}
+- Key bindings: {KEY_BINDINGS}
+
+## Communication
+
+- Be concise and direct
+- No unnecessary praise or filler
+- Focus on technical accuracy
+
+---
+
+## Success Metrics
+
+Code is successful when:
+- All tests pass (80%+ coverage)
+- No security vulnerabilities
+- Code is readable and maintainable
+- User requirements are met

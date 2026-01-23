@@ -72,52 +72,61 @@ nano CLAUDE.md
 Tell ChocoVine to scan your project so it understands your architecture patterns.
 
 ```bash
-# /init auto-detects: new project wizard OR existing project scan
-/init
+# /cv:init auto-detects: new project wizard OR existing project scan
+/cv:init
 ```
 
 ---
 
 ## 🎮 How to Use
 
-### The Magic Command (`/start`)
+### The Core Workflow
 
-For 95% of tasks, you only need one command. ChocoVine handles the planning, testing, and building automatically.
+For most tasks, follow this flow. You control each phase with explicit approval gates.
 
 ```bash
-/start Add a login page with Google OAuth
+/cv:research Add a login page with Google OAuth
+/cv:plan
+/cv:build
+npm test
+/cv:review
 ```
 
-**What happens next?**
-1.  🕵️ **Scan:** Claude maps your codebase structure and patterns.
-2.  🗣️ **Clarify:** It asks you specific questions (e.g., "Do you want to use Firebase or Auth0?").
-3.  📝 **Plan:** It presents architecture and tasks. You approve.
-4.  🧪 **Test:** It creates failing tests (because the code doesn't exist yet).
-5.  ✅ **Build:** It writes the code to pass those tests, validates, and reviews.
+**What happens at each step?**
+1. **Research:** Claude maps your codebase, identifies patterns, asks clarifying questions.
+2. **Plan:** Presents architecture and tasks. You approve before any code is written.
+3. **Build:** Implements the approved plan with inline validation.
+4. **Test:** You run tests manually to verify.
+5. **Review:** Code quality, security audit, and coverage check.
 
 ---
 
 ## 🧩 The Workflow
 
-How do we guarantee code quality? We strictly follow the **Plan → Test → Build** loop. This prevents the "spaghetti code" effect common with other AI tools.
+How do we guarantee code quality? We strictly follow the **Research → Plan → Build → Review** loop. This prevents the "spaghetti code" effect common with other AI tools.
 
 ```mermaid
 graph LR
-    A[/init] --> B[/plan]
-    B --> C[/build]
+    A[/cv:research] --> B[/cv:plan]
+    B --> C[/cv:build]
+    C --> D[test]
+    D --> E[/cv:review]
+
+    subgraph Research
+    A1[Scan] --> A2[Clarify]
+    A2 --> A3[Requirements]
+    end
 
     subgraph Plan
-    B1[Scan] --> B2[Requirements]
-    B2 --> B3[Tests]
-    B3 --> B4[Architecture]
+    B1[Architecture] --> B2[Tasks]
+    B2 --> B3[Test Specs]
     end
 
     subgraph Build
     C1[Implement] --> C2[Validate]
-    C2 --> C3[Review]
     end
 
-    style B3 fill:#f96,stroke:#333,stroke-width:2px
+    style A3 fill:#f96,stroke:#333,stroke-width:2px
     style C1 fill:#9f6,stroke:#333,stroke-width:2px
 ```
 
@@ -128,41 +137,40 @@ graph LR
 ### Core Commands
 | Command | Description |
 | :--- | :--- |
-| `/start [task]` | **The Main Event.** Runs `/plan` then `/build` automatically. |
-| `/plan [task]` | **The Planner.** Scan → Requirements → Tests → Architecture. |
-| `/build [session]` | **The Builder.** Implement → Validate → Review. |
-| `/fix [error]` | **Bug Hunter.** Systematic debugging or quick fixes. |
-| `/refactor [type]` | **Code Surgeon.** Dead code cleanup, rename/move, extract, or general refactoring. |
-| `/init` | **Setup.** New project wizard OR scan existing codebase. |
+| `/cv:research [topic]` | **Research.** Gather context, requirements, resolve conflicts. |
+| `/cv:plan [session]` | **Plan.** Architecture, tasks, test specs (from research). |
+| `/cv:build [session]` | **Build.** Implement tasks, validate, generate test instructions. |
+| `/cv:review [session]` | **Review.** Code quality, security audit, coverage check. |
+| `/cv:fix [error]` | **Fix.** Systematic debugging or quick fixes. |
+| `/cv:refactor [type]` | **Refactor.** Dead code cleanup, rename/move, extract, or general. |
+| `/cv:init` | **Setup.** New project wizard OR scan existing codebase. |
 
-### Research
+### Research Modes
 | Command | Description |
 | :--- | :--- |
-| `/research [topic]` | **Auto-routes.** Detects Figma URLs, docs, or general topics. |
-| `/research --ui [figma-url]` | **Figma → Code.** Extracts tokens, CSS, and layout. |
-| `/research --docs [library]` | **External Knowledge.** Reads library documentation. |
-| `/research --analyze [topic]` | **Deep Dive.** Concept exploration and trade-off analysis. |
+| `/cv:research [topic]` | **Auto-routes.** Detects Figma URLs, docs, or general topics. |
+| `/cv:research --ui [figma-url]` | **Figma to Code.** Extracts tokens, CSS, and layout. |
+| `/cv:research --docs [library]` | **External Knowledge.** Reads library documentation. |
 
 <details>
-<summary><b>🔄 Migration from v1.x</b> (Click to expand)</summary>
+<summary><b>🔄 Migration from v2.x</b> (Click to expand)</summary>
 <br />
-Commands have been consolidated for simplicity:
+Commands now use the `cv:` prefix for clarity:
 
 | Old Command | New Equivalent |
 | :--- | :--- |
-| `/initialize` | `/init` |
-| `/project-scan` | `/init` (auto-detects existing project) |
-| `/research:codebase` | Part of `/plan` (Step 1: Scan) |
-| `/research:feature` | Part of `/plan` (Step 2: Requirements) |
-| `/research:spec` | Part of `/plan` (Step 3: Test Spec) |
-| `/generate:tests` | Part of `/plan` (Step 4: Generate Tests) |
-| `/research:plan` | Part of `/plan` (Step 5: Architecture) |
-| `/execute` | `/build` (Step 1-2: Implement) |
-| `/code-check` | `/build` (Step 3-4: Validate & Review) |
-| `/quick-fix` | `/fix` |
-| `/research:ui` | `/research --ui` |
-| `/research:docs` | `/research --docs` |
-| `/analyze` | `/research --analyze` |
+| `/start [task]` | `/cv:research` → `/cv:plan` → `/cv:build` → `/cv:review` |
+| `/init` | `/cv:init` |
+| `/plan` | `/cv:plan` |
+| `/build` | `/cv:build` |
+| `/fix` | `/cv:fix` |
+| `/refactor` | `/cv:refactor` |
+| `/research` | `/cv:research` |
+
+**Why the change?**
+- Namespace isolation: `cv:` prefix prevents conflicts with other tools
+- Explicit workflow: each command has one job with approval gates
+- Better visibility: clear separation of concerns
 
 </details>
 
