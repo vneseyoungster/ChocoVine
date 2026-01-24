@@ -1,46 +1,134 @@
-# User Preferences
+## Core Philosophy
 
-Personal coding preferences applied across all projects.
+You are Claude Code. I use specialized agents and skills for complex tasks.
+
+**Key Principles:**
+1. **Agent-First**: Delegate to specialized agents for complex work
+2. **Parallel Execution**: Use Task tool with multiple agents when possible
+3. **Plan Before Execute**: Use Plan Mode for complex operations
+4. **Test-Driven**: Write tests before implementation
+5. **Security-First**: Never compromise on security
 
 ---
 
-## Code Style
+## Modular Rules
 
+Detailed guidelines are in `.claude/rules/`:
+
+| Rule File | Contents |
+|-----------|----------|
+| security.md | Security checks, secret management |
+| coding-style.md | Immutability, file organization, error handling |
+| testing.md | TDD workflow, 80% coverage requirement |
+| git-workflow.md | Commit format, PR workflow |
+| agents.md | Agent orchestration, when to use which |
+| patterns.md | API response, repository patterns |
+| performance.md | Model selection, context management |
+| hooks.md | Hook configuration and registry |
+
+---
+
+## Available Agents
+
+Located in `.claude/agents/`:
+
+| Category | Agent | Purpose |
+|----------|-------|---------|
+| **Research** | codebase-explorer | Fast codebase structure mapping |
+| | frontend-researcher | UI/React patterns analysis |
+| | backend-researcher | API/database analysis |
+| | module-researcher | Deep-dive on specific modules |
+| | pattern-researcher | Identify existing conventions |
+| | dependency-researcher | Package analysis, security audit |
+| | ui-researcher | Figma design extraction |
+| **Questioning** | requirement-analyst | Clarify requirements |
+| **Planning** | solution-architect | Architecture design, decisions |
+| | task-planner | Break down into atomic tasks |
+| | test-spec-generator | Generate failing test specs |
+| **Validation** | code-reviewer | Review code quality, security |
+| | test-automator | Write and run tests |
+| | security-auditor | OWASP compliance, vuln scanning |
+| | documentation-writer | Update docs |
+| **Refactoring** | refactor-cleaner | Dead code cleanup, consolidation |
+| **Documentation** | project-scanner | Generate project documentation |
+| **Implementation** | full-stack-developer | Find code locations |
+| **Utility** | review-generator | Create review summaries |
+| | summarize-agent | Compress content |
+
+---
+
+## Slash Commands
+
+| Command | Purpose |
+|---------|---------|
+| `/cv:research` | Gather context, requirements, resolve conflicts |
+| `/cv:plan` | Architecture, tasks, test specs (from research) |
+| `/cv:build` | Implement, validate, generate test instructions |
+| `/cv:review` | Code review, security audit, coverage check |
+| `/cv:fix` | Bug fix with systematic-debugging |
+| `/cv:refactor` | Safe refactoring: clean, rename, extract |
+| `/cv:init` | New project wizard or scan existing |
+
+---
+
+## Personal Preferences
+
+### Code Style
 - No emojis in code, comments, or documentation
 - Prefer immutability - never mutate objects or arrays
 - Many small files over few large files
 - 200-400 lines typical, 800 max per file
 
-## Git
-
+### Git
 - Conventional commits: `feat:`, `fix:`, `refactor:`, `docs:`, `test:`
 - Always test locally before committing
 - Small, focused commits
 
-## Testing
-
+### Testing
 - TDD: Write tests first
 - 80% minimum coverage
 - Unit + integration + E2E for critical flows
 
-## Editor
+---
 
-- Primary editor: {EDITOR}
-- Vim mode: {VIM_MODE}
-- Key bindings: {KEY_BINDINGS}
+## Workflow
 
-## Communication
+```
+┌─────────────┐   ┌──────────┐   ┌────────────┐   ┌────────┐   ┌─────────────┐
+│/cv:research │-->│ /cv:plan │-->│ /cv:build  │-->│ [test] │-->│ /cv:review  │
+└─────────────┘   └──────────┘   └────────────┘   └────────┘   └─────────────┘
+```
 
-- Be concise and direct
-- No unnecessary praise or filler
-- Focus on technical accuracy
+Quick reference:
+- New project? -> `/cv:init`
+- New feature? -> `/cv:research` -> `/cv:plan` -> `/cv:build` -> test -> `/cv:review`
+- Bug fix? -> `/cv:fix {problem}`
+- Research? -> `/cv:research {topic}`
+- Clean up code? -> `/cv:refactor clean`
+
+---
+
+## Output Locations
+
+| Document | Location |
+|----------|----------|
+| Session Root | `plans/sessions/{date}-{slug}/` |
+| Research | `{session}/research/` |
+| Plans | `{session}/plans/` |
+| Code Changes | `{session}/code-changes/` |
+| Reviews | `{session}/reviews/` |
+| Build Summary | `{session}/build-complete.md` |
 
 ---
 
 ## Success Metrics
 
-Code is successful when:
+You are successful when:
 - All tests pass (80%+ coverage)
 - No security vulnerabilities
 - Code is readable and maintainable
 - User requirements are met
+
+---
+
+**Philosophy**: Agent-first design, parallel execution, plan before action, test before code, security always.
