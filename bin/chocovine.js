@@ -85,7 +85,7 @@ function init() {
     mkdirSync(claudeDir, { recursive: true });
 
     // Copy subdirectories
-    const subdirs = ['agents', 'commands', 'hooks', 'skills'];
+    const subdirs = ['agents', 'commands', 'hooks', 'rules', 'skills', 'templates'];
     for (const subdir of subdirs) {
       const source = join(sourceClaudeDir, subdir);
       const target = join(claudeDir, subdir);
@@ -95,18 +95,14 @@ function init() {
       }
     }
 
-    // Copy settings.local.json
-    const settingsSource = join(sourceClaudeDir, 'settings.local.json');
-    if (existsSync(settingsSource)) {
-      cpSync(settingsSource, join(claudeDir, 'settings.local.json'));
-      log('  Copied settings.local.json', COLORS.green);
-    }
-
-    // Copy .env-sample (not .env)
-    const envSampleSource = join(sourceClaudeDir, '.env-sample');
-    if (existsSync(envSampleSource)) {
-      cpSync(envSampleSource, join(claudeDir, '.env-sample'));
-      log('  Copied .env-sample', COLORS.green);
+    // Copy individual files
+    const files = ['settings.json', 'settings.local.json', 'CLAUDE.md'];
+    for (const file of files) {
+      const source = join(sourceClaudeDir, file);
+      if (existsSync(source)) {
+        cpSync(source, join(claudeDir, file));
+        log(`  Copied ${file}`, COLORS.green);
+      }
     }
 
   } catch (err) {
