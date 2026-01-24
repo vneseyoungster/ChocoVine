@@ -1,6 +1,6 @@
 {
   "name": "chocovine",
-  "version": "3.0.0",
+  "version": "3.0.1",
   "description": "A workflow wrapper for Claude Code that forces AI to think before it types. Stop prompting. Start building.",
   "keywords": [
     "claude",
@@ -34,8 +34,9 @@
     ".claude/rules",
     ".claude/skills",
     ".claude/templates",
+    ".claude/settings.json",
     ".claude/settings.local.json",
-    ".claude/.env-sample",
+    ".claude/CLAUDE.md",
     "CLAUDE.md",
     "README.md"
   ],

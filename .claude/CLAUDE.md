@@ -24,6 +24,7 @@ Detailed guidelines in `.claude/rules/`:
 | agents.md | Agent orchestration, when to use which |
 | patterns.md | API response, repository patterns |
 | performance.md | Model selection, context management |
+| hooks.md | Hook configuration and registry |
 
 ---
 
