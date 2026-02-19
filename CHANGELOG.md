@@ -6,6 +6,47 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ---
 
+## [3.0.3] - 2026-02-19
+
+### Added
+
+#### Hooks Configuration
+
+Added hooks to `.claude/settings.json` for session persistence and strategic context management.
+
+| Hook | Script | Purpose |
+|------|--------|---------|
+| PreToolUse (Edit/Write) | `suggest-compact.sh` | Suggests `/compact` after 50+ tool calls |
+| PreCompact | `pre-compact.sh` | Saves state before context compaction |
+| SessionStart | `session-start.sh` | Loads previous session context on startup |
+| Stop | `session-end.sh` | Persists session state on exit |
+
+#### Hook Scripts
+
+| File | Description |
+|------|-------------|
+| `.claude/hooks/strategic-compact/suggest-compact.sh` | Tracks tool calls, suggests compaction at logical intervals |
+| `.claude/hooks/memory-persistence/pre-compact.sh` | Logs compaction events, preserves active session state |
+| `.claude/hooks/memory-persistence/session-start.sh` | Finds recent sessions and learned skills |
+| `.claude/hooks/memory-persistence/session-end.sh` | Creates/updates daily session files |
+
+### Benefits
+
+- **Session continuity** - Context preserved across sessions via `~/.claude/sessions/`
+- **Strategic compaction** - Compact at logical phase transitions, not arbitrary points
+- **Compaction logging** - Track when context was summarized in `compaction-log.txt`
+- **Learned skills discovery** - Session start notifies of available learned skills
+
+### Summary
+
+| Category | Count |
+|----------|-------|
+| Hooks Added | 4 |
+| Scripts Added | 4 |
+| **Total Files Changed** | **5** |
+
+---
+
 ## [3.0.0] - 2026-01-23
 
 ### Breaking Changes - Command Namespace Update
